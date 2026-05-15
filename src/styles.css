@@ -665,6 +665,137 @@ body { font-family: 'Geist', system-ui, sans-serif; font-feature-settings: 'ss01
 .sync-banner-btn:active { transform: scale(0.97); }
 .sync-banner-btn:disabled { opacity: 0.5; cursor: progress; }
 
+/* ─────────── monthly analytics ─────────── */
+.monthly-analytics { padding: 14px 8px 4px; }
+.monthly-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 8px 10px;
+  border-bottom: 1px solid var(--hairline);
+  margin-bottom: 10px;
+  gap: 10px;
+}
+.monthly-title {
+  font-family: 'Instrument Serif', serif;
+  font-size: 18px; color: var(--ink); line-height: 1;
+}
+.monthly-years { display: flex; gap: 2px; flex-wrap: wrap; }
+.monthly-year {
+  background: none; border: none; padding: 4px 7px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: 0.1em; color: var(--muted-2);
+  cursor: pointer; border-bottom: 1px solid transparent;
+}
+.monthly-year.on { color: var(--ink); border-bottom-color: var(--ink); }
+
+.monthly-meta {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  padding: 0 8px 10px;
+  gap: 1px; background: var(--hairline);
+  border-bottom: 1px solid var(--hairline);
+}
+.monthly-meta { padding: 0; }
+.monthly-meta-cell {
+  background: var(--bg); padding: 10px 12px;
+  display: flex; flex-direction: column; gap: 3px;
+}
+.monthly-meta-k {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; letter-spacing: 0.16em; color: var(--muted);
+  text-transform: uppercase;
+}
+.monthly-meta-v { font-size: 14px; color: var(--ink); }
+.monthly-chart { padding: 10px 4px 0; }
+
+/* ─────────── clean verification row ─────────── */
+.verif-row.clean {
+  display: grid; grid-template-columns: 36px 1fr auto;
+  align-items: center; gap: 12px;
+  padding: 14px 16px;
+  text-decoration: none; color: inherit;
+  border-bottom: 1px solid var(--hairline);
+}
+.verif-row.clean:last-child { border-bottom: none; }
+.verif-row.clean:active { background: var(--bg-2); }
+.verif-icon {
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid var(--hairline-2);
+  color: var(--ink);
+  background: var(--bg-2);
+}
+.verif-body { min-width: 0; }
+.verif-body .verif-name { font-size: 14px; color: var(--ink); }
+.verif-body .verif-sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: 0.06em;
+  color: var(--muted); margin-top: 3px;
+  text-transform: uppercase;
+}
+
+/* ─────────── statement ledger ─────────── */
+.ledger {
+  margin: 0 18px;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+}
+.ledger-head {
+  display: grid;
+  grid-template-columns: 90px 96px 1fr 56px 80px 100px;
+  align-items: center;
+  padding: 10px 12px;
+  background: var(--bg-2);
+  border-bottom: 1px solid var(--hairline);
+  font-size: 9px; letter-spacing: 0.18em; color: var(--muted);
+  text-transform: uppercase;
+}
+.ledger-row {
+  display: grid;
+  grid-template-columns: 90px 96px 1fr 56px 80px 100px;
+  align-items: center;
+  padding: 12px 12px;
+  border-bottom: 1px solid var(--hairline);
+  font-size: 12.5px;
+}
+.ledger-row:last-child { border-bottom: none; }
+.ledger.compact {
+  margin-top: 6px;
+}
+.ledger.compact .ledger-row {
+  grid-template-columns: 80px 90px 1fr auto;
+  padding: 10px 12px;
+  font-size: 12px;
+}
+.ledger-date { font-size: 11.5px; color: var(--ink); }
+.ledger-time { font-size: 10px; color: var(--muted); margin-top: 2px; }
+.ledger-strong { font-size: 13px; color: var(--ink); }
+.ledger-sub {
+  font-size: 9.5px; letter-spacing: 0.12em;
+  color: var(--muted-2); margin-top: 3px; text-transform: uppercase;
+}
+.lc-lots, .lc-price, .lc-pnl { text-align: right; }
+.lc-pnl { font-size: 13px; }
+
+.side-pill {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; letter-spacing: 0.14em;
+  padding: 3px 7px;
+  border: 1px solid;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.side-buy { color: var(--pos); border-color: #c8e2d6; background: #f1f7f4; }
+.side-sell { color: var(--neg); border-color: #e3c5c5; background: #faf2f2; }
+.side-balance { color: #6b6b6b; border-color: var(--hairline-2); background: #fafaf3; }
+
+/* Compact ledger on narrow phones */
+@media (max-width: 420px) {
+  .ledger-head, .ledger-row {
+    grid-template-columns: 72px 84px 1fr 84px;
+  }
+  .lc-lots, .lc-price { display: none; }
+}
+
 /* ─────────── tablet / iPad (shell visible but enlarged) ─────────── */
 @media (min-width: 900px) and (max-width: 1279px) {
   .device-shell {

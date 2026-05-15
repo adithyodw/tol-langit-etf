@@ -37,7 +37,7 @@ const ICONS: Record<Tab, JSX.Element> = {
 
 const LABEL: Record<Tab, string> = {
   home: 'Home',
-  signals: 'Signals',
+  signals: 'Products',
   systems: 'Systems',
   activity: 'Activity',
   profile: 'Profile',

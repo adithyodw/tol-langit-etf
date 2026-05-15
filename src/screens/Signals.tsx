@@ -6,7 +6,21 @@ interface Props {
   onOpen: (id: 'v10' | 'gold') => void;
 }
 
-function SignalCard({ s, onOpen }: { s: SignalStats; onOpen: () => void }) {
+const MQL5_ICON = (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+    <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="1.5" />
+    <path d="M7 16V8l3 5 3-5v8M16 8v8h2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+const MYFX_ICON = (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+    <path d="M3 17l5-6 4 4 4-6 5 8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+    <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="1.4" />
+  </svg>
+);
+
+function ProductCard({ s, onOpen }: { s: SignalStats; onOpen: () => void }) {
   return (
     <button className="system-row" onClick={onOpen}>
       <div className="system-row-top">
@@ -39,21 +53,21 @@ export function Signals({ v10, gold, onOpen }: Props) {
       <div className="topbar">
         <div className="topbar-l">
           <span className="kicker">MYFXBOOK · VERIFIED</span>
-          <h1 className="topbar-title">Signals</h1>
+          <h1 className="topbar-title">Products</h1>
         </div>
       </div>
 
       <div className="footnote sm-pad" style={{ paddingTop: 0 }}>
-        Two independent live trading signals. Each one is publicly verified on Myfxbook with shadow tracking on MQL5. No private capital, no managed accounts.
+        Two independent live ETF products inside the TOL LANGIT ETF wrapper. Each one is publicly verified on Myfxbook with shadow tracking on MQL5. No private capital pooling, no managed accounts.
       </div>
 
       <div className="section-label">
-        <span>Active Signals</span>
+        <span>Active Products</span>
         <span className="section-right">{list.length} listed</span>
       </div>
       <div className="systems-list">
         {list.map(s => (
-          <SignalCard key={s.id} s={s} onOpen={() => onOpen(s.id)} />
+          <ProductCard key={s.id} s={s} onOpen={() => onOpen(s.id)} />
         ))}
       </div>
 
@@ -70,17 +84,19 @@ export function Signals({ v10, gold, onOpen }: Props) {
                 <span className="verif-sys-name">{s.name}</span>
                 <span className="verif-sys-meta mono">{s.account}</span>
               </div>
-              <a href={s.myfxbookUrl} target="_blank" rel="noreferrer" className="verif-row">
-                <div>
-                  <div className="verif-name">Myfxbook · Primary</div>
-                  <div className="verif-href mono">{s.myfxbookUrl.replace('https://', '')}</div>
+              <a href={s.myfxbookUrl} target="_blank" rel="noreferrer" className="verif-row clean">
+                <span className="verif-icon">{MYFX_ICON}</span>
+                <div className="verif-body">
+                  <div className="verif-name">Myfxbook</div>
+                  <div className="verif-sub">Primary source · live tracker</div>
                 </div>
                 <span className="verif-chev">↗</span>
               </a>
-              <a href={s.mql5Url} target="_blank" rel="noreferrer" className="verif-row">
-                <div>
-                  <div className="verif-name">MQL5 · Reference</div>
-                  <div className="verif-href mono">{s.mql5Url.replace('https://', '')}</div>
+              <a href={s.mql5Url} target="_blank" rel="noreferrer" className="verif-row clean">
+                <span className="verif-icon">{MQL5_ICON}</span>
+                <div className="verif-body">
+                  <div className="verif-name">MQL5</div>
+                  <div className="verif-sub">Reference · independent verification</div>
                 </div>
                 <span className="verif-chev">↗</span>
               </a>

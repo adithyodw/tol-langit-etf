@@ -1,26 +1,41 @@
-import { useMemo } from 'react';
-import { SignalStats, buildEquityCurve } from '../data/signals';
-import { EquityChart } from '../components/EquityChart';
+import { SignalStats } from '../data/signals';
+import { MonthlyAnalytics } from '../components/MonthlyAnalytics';
+import { V10_MONTHLY, GOLD_MONTHLY } from '../data/monthlyReturns';
 
 interface Props {
   signal: SignalStats;
   onBack: () => void;
 }
 
-export function SignalDetail({ signal: s, onBack }: Props) {
-  const curve = useMemo(
-    () => buildEquityCurve(1000, s.growthPct, 36, s.id === 'gold' ? 3 : 11),
-    [s]
-  );
+const MQL5_ICON = (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+    <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="1.5" />
+    <path d="M7 16V8l3 5 3-5v8M16 8v8h2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
 
+const MYFX_ICON = (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+    <path d="M3 17l5-6 4 4 4-6 5 8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+    <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="1.4" />
+  </svg>
+);
+
+export function SignalDetail({ signal: s, onBack }: Props) {
   const color = s.id === 'gold' ? '#b89a4e' : '#0a1f3d';
+  const monthly = s.id === 'gold' ? GOLD_MONTHLY : V10_MONTHLY;
 
   return (
     <div className="screen">
       <div className="topbar">
         <button className="back" onClick={onBack}>← Back</button>
         <span className="badge badge-pos">
-          <span style={{ display: 'inline-block', width: 6, height: 6, borderRadius: '50%', background: '#1a6e54', marginRight: 6 }} />
+          <span
+            style={{
+              display: 'inline-block', width: 6, height: 6, borderRadius: '50%',
+              background: '#1a6e54', marginRight: 6,
+            }}
+          />
           LIVE
         </span>
       </div>
@@ -43,13 +58,12 @@ export function SignalDetail({ signal: s, onBack }: Props) {
         </div>
       </div>
 
+      <div className="section-label">
+        <span>Monthly Analytics</span>
+        <span className="section-right">Per month</span>
+      </div>
       <div className="card no-pad">
-        <EquityChart data={curve} color={color} height={180} />
-        <div className="hr" />
-        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0 10px 8px', fontSize: 10.5, color: 'var(--muted)' }}>
-          <span className="mono">Last update {s.lastUpdate}</span>
-          <span className="mono">Model curve</span>
-        </div>
+        <MonthlyAnalytics data={monthly} title={`${s.name} · Monthly gain`} />
       </div>
 
       <div className="section-label"><span>Performance</span></div>
@@ -76,17 +90,19 @@ export function SignalDetail({ signal: s, onBack }: Props) {
       <div className="section-label"><span>Verification</span></div>
       <div className="card" style={{ padding: 0 }}>
         <div className="verif-list">
-          <a href={s.mql5Url} target="_blank" rel="noreferrer" className="verif-row">
-            <div>
-              <div className="verif-name">MQL5 Signal Page</div>
-              <div className="verif-href mono">{s.mql5Url.replace('https://', '')}</div>
+          <a href={s.myfxbookUrl} target="_blank" rel="noreferrer" className="verif-row clean">
+            <span className="verif-icon">{MYFX_ICON}</span>
+            <div className="verif-body">
+              <div className="verif-name">Myfxbook</div>
+              <div className="verif-sub">Primary source · live tracker</div>
             </div>
             <span className="verif-chev">↗</span>
           </a>
-          <a href={s.myfxbookUrl} target="_blank" rel="noreferrer" className="verif-row">
-            <div>
-              <div className="verif-name">Myfxbook Tracker</div>
-              <div className="verif-href mono">{s.myfxbookUrl.replace('https://', '')}</div>
+          <a href={s.mql5Url} target="_blank" rel="noreferrer" className="verif-row clean">
+            <span className="verif-icon">{MQL5_ICON}</span>
+            <div className="verif-body">
+              <div className="verif-name">MQL5</div>
+              <div className="verif-sub">Reference · independent verification</div>
             </div>
             <span className="verif-chev">↗</span>
           </a>
@@ -94,7 +110,7 @@ export function SignalDetail({ signal: s, onBack }: Props) {
       </div>
 
       <div className="footnote">
-        All metrics are pulled from the publicly verified MQL5 signal and shadow-tracked on Myfxbook. Past performance is not a guarantee of future results.
+        All metrics are pulled from the publicly verified Myfxbook account and shadow-tracked on MQL5. Past performance is not a guarantee of future results.
       </div>
     </div>
   );
