@@ -121,7 +121,7 @@ export function Activity() {
         ))}
       </div>
 
-      <div className="ledger">
+      <div className="ledger statement-ledger">
         <div className="ledger-head mono">
           <span className="lc-date">Date</span>
           <span className="lc-action">Action</span>
@@ -154,9 +154,7 @@ export function Activity() {
             <div
               className="lc-pnl mono"
               style={{
-                color: r.status === 'open'
-                  ? (r.pnl >= 0 ? 'var(--pos)' : 'var(--neg)')
-                  : r.pnl >= 0 ? 'var(--pos)' : 'var(--neg)',
+                color: r.pnl >= 0 ? 'var(--pos)' : 'var(--neg)',
               }}
             >
               {fmtMoney(r.pnl, r.currency)}
