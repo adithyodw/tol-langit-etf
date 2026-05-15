@@ -21,6 +21,13 @@ const MYFX_ICON = (
   </svg>
 );
 
+const DOC_ICON = (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+    <path d="M6 3h9l4 4v14H6z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+    <path d="M14 3v5h5M9 13h7M9 17h7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+  </svg>
+);
+
 export function SignalDetail({ signal: s, onBack }: Props) {
   const color = s.id === 'gold' ? '#b89a4e' : '#0a1f3d';
   const monthly = s.id === 'gold' ? GOLD_MONTHLY : V10_MONTHLY;
@@ -41,9 +48,11 @@ export function SignalDetail({ signal: s, onBack }: Props) {
       </div>
 
       <div className="sys-hero">
-        <span className="kicker">{s.broker.toUpperCase()} · {s.account}</span>
+        <span className="kicker">{s.broker.toUpperCase()} · #{s.brokerAccount} · {s.platform.toUpperCase()}</span>
         <h1 className="sys-hero-name">{s.name}</h1>
-        <div className="sys-hero-meta">{s.role} · Started {s.startedOn}</div>
+        <div className="sys-hero-meta">
+          {s.role} · {s.currency} · Started {s.startedOn}
+        </div>
       </div>
 
       <div className="hero">
@@ -53,7 +62,7 @@ export function SignalDetail({ signal: s, onBack }: Props) {
         </div>
         <div className="hero-delta">
           <span className="mono" style={{ color: 'var(--muted)' }}>
-            MQL5 growth +{s.mql5GrowthPct.toFixed(2)}%
+            Abs gain +{s.absGainPct.toFixed(2)}% · Monthly avg {s.monthlyPct.toFixed(2)}%
           </span>
         </div>
       </div>
@@ -69,14 +78,17 @@ export function SignalDetail({ signal: s, onBack }: Props) {
       <div className="section-label"><span>Performance</span></div>
       <div className="card">
         <div className="stat-table">
+          <div className="stat-row"><span className="stat-k">Gain</span><span className="stat-v mono" style={{ color: 'var(--pos)' }}>+{s.growthPct.toFixed(2)}%</span></div>
+          <div className="stat-row"><span className="stat-k">Abs. Gain</span><span className="stat-v mono">+{s.absGainPct.toFixed(2)}%</span></div>
+          <div className="stat-row"><span className="stat-k">Daily</span><span className="stat-v mono">{s.dailyPct.toFixed(2)}%</span></div>
+          <div className="stat-row"><span className="stat-k">Monthly</span><span className="stat-v mono">{s.monthlyPct.toFixed(2)}%</span></div>
+          <div className="stat-row"><span className="stat-k">Drawdown</span><span className="stat-v mono" style={{ color: 'var(--neg)' }}>{s.drawdownPct.toFixed(2)}%</span></div>
+          <div className="stat-row"><span className="stat-k">Profit Factor</span><span className="stat-v mono">{s.profitFactor.toFixed(2)}</span></div>
           <div className="stat-row"><span className="stat-k">Win Rate</span><span className="stat-v mono">{s.winRatePct}%</span></div>
-          <div className="stat-row"><span className="stat-k">Profit Factor</span><span className="stat-v mono">{s.profitFactor}</span></div>
           <div className="stat-row"><span className="stat-k">Trades</span><span className="stat-v mono">{s.trades.toLocaleString()}</span></div>
-          <div className="stat-row"><span className="stat-k">Max Drawdown</span><span className="stat-v mono" style={{ color: 'var(--neg)' }}>{s.drawdownPct}%</span></div>
-          <div className="stat-row"><span className="stat-k">Monthly Avg</span><span className="stat-v mono">+{s.monthlyPct}%</span></div>
-          <div className="stat-row"><span className="stat-k">Balance</span><span className="stat-v mono">{s.currency} {s.balance.toLocaleString()}</span></div>
-          <div className="stat-row"><span className="stat-k">Equity</span><span className="stat-v mono">{s.currency} {s.equity.toLocaleString()}</span></div>
-          <div className="stat-row"><span className="stat-k">Realized Profit</span><span className="stat-v mono" style={{ color: 'var(--pos)' }}>+{s.currency} {s.profit.toLocaleString()}</span></div>
+          <div className="stat-row"><span className="stat-k">Balance</span><span className="stat-v mono">{s.currency} {s.balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></div>
+          <div className="stat-row"><span className="stat-k">Equity</span><span className="stat-v mono">{s.currency} {s.equity.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></div>
+          <div className="stat-row"><span className="stat-k">Realized Profit</span><span className="stat-v mono" style={{ color: 'var(--pos)' }}>+{s.currency} {s.profit.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></div>
         </div>
       </div>
 
@@ -98,6 +110,14 @@ export function SignalDetail({ signal: s, onBack }: Props) {
             </div>
             <span className="verif-chev">↗</span>
           </a>
+          <a href={s.myfxbookStatementUrl} target="_blank" rel="noreferrer" className="verif-row clean">
+            <span className="verif-icon">{DOC_ICON}</span>
+            <div className="verif-body">
+              <div className="verif-name">Statement</div>
+              <div className="verif-sub">Myfxbook · full trade ledger</div>
+            </div>
+            <span className="verif-chev">↗</span>
+          </a>
           <a href={s.mql5Url} target="_blank" rel="noreferrer" className="verif-row clean">
             <span className="verif-icon">{MQL5_ICON}</span>
             <div className="verif-body">
@@ -110,7 +130,7 @@ export function SignalDetail({ signal: s, onBack }: Props) {
       </div>
 
       <div className="footnote">
-        All metrics are pulled from the publicly verified Myfxbook account and shadow-tracked on MQL5. Past performance is not a guarantee of future results.
+        Broker account #{s.brokerAccount} at {s.broker} ({s.platform}, {s.currency}). Tracked publicly on Myfxbook as account #{s.myfxbookAccountId}. Past performance is not a guarantee of future results.
       </div>
     </div>
   );

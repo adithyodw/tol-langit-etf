@@ -706,6 +706,34 @@ body { font-family: 'Geist', system-ui, sans-serif; font-feature-settings: 'ss01
 .monthly-meta-v { font-size: 14px; color: var(--ink); }
 .monthly-chart { padding: 10px 4px 0; }
 
+.monthly-empty {
+  padding: 38px 22px 32px;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  text-align: center;
+}
+.monthly-empty-k {
+  font-size: 10px; letter-spacing: 0.2em; color: var(--muted);
+  text-transform: uppercase;
+}
+.monthly-empty-sub {
+  font-size: 12px; color: var(--muted-2); line-height: 1.5; max-width: 260px;
+}
+
+/* segmented V10 / Gold control in section labels */
+.seg {
+  display: inline-flex; gap: 0;
+  border: 1px solid var(--hairline-2);
+}
+.seg-btn {
+  background: var(--bg); border: none; padding: 5px 11px; cursor: pointer;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: 0.14em; color: var(--muted);
+  text-transform: uppercase;
+  border-right: 1px solid var(--hairline-2);
+}
+.seg-btn:last-child { border-right: none; }
+.seg-btn.on { background: var(--ink); color: var(--bg); }
+
 /* ─────────── clean verification row ─────────── */
 .verif-row.clean {
   display: grid; grid-template-columns: 36px 1fr auto;

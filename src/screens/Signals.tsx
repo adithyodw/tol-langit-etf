@@ -39,7 +39,7 @@ function ProductCard({ s, onOpen }: { s: SignalStats; onOpen: () => void }) {
         <div><div className="srg-k">Trades</div><div className="srg-v mono">{s.trades.toLocaleString()}</div></div>
       </div>
       <div className="system-row-foot">
-        <span className="system-pairs">{s.broker} · {s.account}</span>
+        <span className="system-pairs">{s.broker} · #{s.brokerAccount} · {s.platform} · {s.currency}</span>
         <span className="system-chev">Open →</span>
       </div>
     </button>
@@ -82,7 +82,7 @@ export function Signals({ v10, gold, onOpen }: Props) {
                   style={{ background: s.id === 'gold' ? '#b89a4e' : '#0a1f3d' }}
                 />
                 <span className="verif-sys-name">{s.name}</span>
-                <span className="verif-sys-meta mono">{s.account}</span>
+                <span className="verif-sys-meta mono">#{s.myfxbookAccountId}</span>
               </div>
               <a href={s.myfxbookUrl} target="_blank" rel="noreferrer" className="verif-row clean">
                 <span className="verif-icon">{MYFX_ICON}</span>

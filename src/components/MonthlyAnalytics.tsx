@@ -17,23 +17,23 @@ interface Props {
   height?: number;
 }
 
-// Myfxbook-style rotating palette — keeps successive months visually distinct.
 const PALETTE = ['#7E6BAE', '#D97B7B', '#3DA38A', '#E8A672', '#5B8DBE', '#C49B3E'];
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 export function MonthlyAnalytics({ data, title = 'Monthly Analytics', height = 220 }: Props) {
   const years = useMemo(() => yearsOf(data), [data]);
-  const [year, setYear] = useState<number>(years[0] ?? new Date().getFullYear());
+  const [year, setYear] = useState<number>(years[years.length - 1] ?? new Date().getFullYear());
 
   const rows = useMemo(() => {
     const yearData = data[year] ?? {};
-    const present: { label: string; value: number; color: string; key: string }[] = [];
+    const present: { label: string; short: string; value: number; color: string; key: string }[] = [];
     let palIdx = 0;
     for (let m = 1; m <= 12; m++) {
       const v = yearData[m];
       if (typeof v !== 'number') continue;
       present.push({
         key: `${year}-${m}`,
+        short: MONTHS[m - 1],
         label: `${MONTHS[m - 1]} ${year}`,
         value: Number(v.toFixed(2)),
         color: PALETTE[palIdx % PALETTE.length],
@@ -43,7 +43,8 @@ export function MonthlyAnalytics({ data, title = 'Monthly Analytics', height = 2
     return present;
   }, [data, year]);
 
-  const yearTotal = rows.reduce((acc, r) => acc * (1 + r.value / 100), 1) - 1;
+  const yearReturn = rows.reduce((acc, r) => acc * (1 + r.value / 100), 1) - 1;
+  const bestMonth = rows.length ? Math.max(...rows.map(r => r.value)) : 0;
 
   return (
     <div className="monthly-analytics">
@@ -65,8 +66,11 @@ export function MonthlyAnalytics({ data, title = 'Monthly Analytics', height = 2
       <div className="monthly-meta">
         <div className="monthly-meta-cell">
           <span className="monthly-meta-k">Year-to-date</span>
-          <span className="monthly-meta-v mono" style={{ color: yearTotal >= 0 ? 'var(--pos)' : 'var(--neg)' }}>
-            {yearTotal >= 0 ? '+' : ''}{(yearTotal * 100).toFixed(2)}%
+          <span
+            className="monthly-meta-v mono"
+            style={{ color: yearReturn >= 0 ? 'var(--pos)' : 'var(--neg)' }}
+          >
+            {rows.length === 0 ? '—' : `${yearReturn >= 0 ? '+' : ''}${(yearReturn * 100).toFixed(2)}%`}
           </span>
         </div>
         <div className="monthly-meta-cell">
@@ -75,45 +79,53 @@ export function MonthlyAnalytics({ data, title = 'Monthly Analytics', height = 2
         </div>
         <div className="monthly-meta-cell">
           <span className="monthly-meta-k">Best month</span>
-          <span className="monthly-meta-v mono" style={{ color: 'var(--pos)' }}>
-            +{rows.length ? Math.max(...rows.map(r => r.value)).toFixed(2) : '0.00'}%
+          <span className="monthly-meta-v mono" style={{ color: bestMonth >= 0 ? 'var(--pos)' : 'var(--neg)' }}>
+            {rows.length === 0 ? '—' : `${bestMonth >= 0 ? '+' : ''}${bestMonth.toFixed(2)}%`}
           </span>
         </div>
       </div>
 
-      <div className="monthly-chart" style={{ width: '100%', height }}>
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={rows} margin={{ top: 18, right: 6, left: 0, bottom: 4 }}>
-            <CartesianGrid stroke="#e6e2d6" strokeDasharray="2 4" vertical={false} />
-            <XAxis
-              dataKey="label"
-              tickFormatter={(label: string) => label.split(' ')[0]}
-              tick={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10, fill: '#6b6862' }}
-              axisLine={{ stroke: '#d8d3c4' }}
-              tickLine={false}
-              interval={0}
-            />
-            <YAxis
-              tickFormatter={v => `${v}%`}
-              tick={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10, fill: '#9a978f' }}
-              axisLine={false}
-              tickLine={false}
-              width={32}
-            />
-            <Bar dataKey="value" radius={[2, 2, 0, 0]} isAnimationActive={false}>
-              {rows.map(r => (
-                <Cell key={r.key} fill={r.color} />
-              ))}
-              <LabelList
-                dataKey="value"
-                position="top"
-                formatter={(v: number) => `${v.toFixed(2)}%`}
-                style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10, fill: '#2a2a28' }}
+      {rows.length === 0 ? (
+        <div className="monthly-empty">
+          <div className="monthly-empty-k mono">NO MONTHLY DATA FOR {year}</div>
+          <div className="monthly-empty-sub">
+            Monthly history backfills when the authenticated Myfxbook sync runs.
+          </div>
+        </div>
+      ) : (
+        <div className="monthly-chart" style={{ width: '100%', height }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={rows} margin={{ top: 22, right: 8, left: 0, bottom: 4 }}>
+              <CartesianGrid stroke="#e6e2d6" strokeDasharray="2 4" vertical={false} />
+              <XAxis
+                dataKey="short"
+                tick={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10, fill: '#6b6862' }}
+                axisLine={{ stroke: '#d8d3c4' }}
+                tickLine={false}
+                interval={0}
               />
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
+              <YAxis
+                tickFormatter={v => `${v}%`}
+                tick={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10, fill: '#9a978f' }}
+                axisLine={false}
+                tickLine={false}
+                width={36}
+              />
+              <Bar dataKey="value" radius={[2, 2, 0, 0]} isAnimationActive={false}>
+                {rows.map(r => (
+                  <Cell key={r.key} fill={r.color} />
+                ))}
+                <LabelList
+                  dataKey="value"
+                  position="top"
+                  formatter={(v: number) => `${v.toFixed(2)}%`}
+                  style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10, fill: '#2a2a28' }}
+                />
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      )}
     </div>
   );
 }

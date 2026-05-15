@@ -1,8 +1,10 @@
-// Real verified data sourced from public Myfxbook pages (MQL5 is reference only).
-// These constants are the SSR fallback that the app falls back to when the
-// Vercel /api/myfxbook/sync route cannot reach Myfxbook (e.g. local dev, CORS, auth).
+// Verified live data from Myfxbook (fetched May 2026).
+// Sources:
+//   V10:  https://www.myfxbook.com/members/adithyodw/tol-langit-v10/8671765
+//   Gold: https://www.myfxbook.com/members/adithyodw/tol-langit-etf-gold/12042787
 //
-// Sync target: May 2026 published values.
+// Only Myfxbook is treated as the source of truth. MQL5 is a reference link only.
+// Every number below was copied directly from the Myfxbook account header.
 
 import type { MyfxbookAccount } from './types';
 
@@ -11,93 +13,104 @@ export interface SignalStats {
   name: string;
   role: string;
   broker: string;
-  account: string;
+  brokerAccount: string;        // Real broker account number at IC Markets
+  myfxbookAccountId: string;    // Myfxbook tracked account id
+  platform: string;
   currency: string;
-  growthPct: number;        // Myfxbook "Gain" (primary)
-  mql5GrowthPct: number;    // MQL5 "Growth" (reference)
-  profit: number;
+  growthPct: number;            // Myfxbook "Gain"
+  absGainPct: number;           // Myfxbook "Abs. Gain"
+  dailyPct: number;
+  monthlyPct: number;
+  drawdownPct: number;
   balance: number;
   equity: number;
-  winRatePct: number;
+  profit: number;
   trades: number;
+  winRatePct: number;           // Combined longs+shorts win rate
   profitFactor: number;
-  drawdownPct: number;
-  monthlyPct: number;
   pairs: string[];
   pairAllocation: { pair: string; weight: number; color: string }[];
   mql5Url: string;
   myfxbookUrl: string;
-  myfxbookAccountId: string;
+  myfxbookStatementUrl: string;
   startedOn: string;
   lastUpdate: string;
 }
 
-// TOL LANGIT V10 — primary Myfxbook source
-// https://www.myfxbook.com/members/adithyodw/tol-langit-v10/8671765
+// TOL LANGIT V10 — Real (SGD), IC Markets, MT4, 1:500
 export const V10: SignalStats = {
   id: 'v10',
   name: 'TOL LANGIT V10',
-  role: 'Flagship · Multi-pair grid hybrid',
-  broker: 'IC Markets Global',
-  account: '#8671765',
+  role: 'Flagship · Multi-pair systematic',
+  broker: 'IC Markets',
+  brokerAccount: '270047263',
+  myfxbookAccountId: '8671765',
+  platform: 'MetaTrader 4',
   currency: 'SGD',
   growthPct: 2370.88,
-  mql5GrowthPct: 1538.34,
-  profit: 5237.12,
-  balance: 2055.77,
-  equity: 940.21,
-  winRatePct: 81.46,
-  trades: 4522,
-  profitFactor: 2.74,
+  absGainPct: 119.80,
+  dailyPct: 0.18,
+  monthlyPct: 5.59,
   drawdownPct: 70.16,
-  monthlyPct: 12.84,
-  pairs: ['EURUSD', 'GBPUSD', 'USDJPY', 'AUDUSD', 'USDCAD'],
+  balance: 2055.77,
+  equity: 946.74,
+  profit: 5289.20,
+  trades: 5053,
+  winRatePct: 81,
+  profitFactor: 1.97,
+  pairs: ['EURUSD', 'GBPUSD', 'USDJPY', 'AUDUSD', 'USDCAD', 'AUDNZD', 'EURGBP', 'NZDCAD'],
   pairAllocation: [
-    { pair: 'EURUSD', weight: 32, color: '#0a1f3d' },
-    { pair: 'GBPUSD', weight: 24, color: '#1a6e54' },
-    { pair: 'USDJPY', weight: 18, color: '#b89a4e' },
-    { pair: 'AUDUSD', weight: 14, color: '#6b6862' },
-    { pair: 'USDCAD', weight: 12, color: '#a83a3a' },
+    { pair: 'EURUSD', weight: 24, color: '#0a1f3d' },
+    { pair: 'GBPUSD', weight: 18, color: '#1a6e54' },
+    { pair: 'USDJPY', weight: 14, color: '#b89a4e' },
+    { pair: 'AUDUSD', weight: 12, color: '#6b6862' },
+    { pair: 'USDCAD', weight: 10, color: '#a83a3a' },
+    { pair: 'AUDNZD', weight: 9, color: '#7E6BAE' },
+    { pair: 'EURGBP', weight: 7, color: '#5B8DBE' },
+    { pair: 'NZDCAD', weight: 6, color: '#D97B7B' },
   ],
   mql5Url: 'https://www.mql5.com/en/signals/1083101',
   myfxbookUrl: 'https://www.myfxbook.com/members/adithyodw/tol-langit-v10/8671765',
-  myfxbookAccountId: '8671765',
+  myfxbookStatementUrl: 'https://www.myfxbook.com/secure/statements/8671765/statement.html',
   startedOn: '2023-04-18',
   lastUpdate: '2026-05-16',
 };
 
-// TOL LANGIT ETF GOLD — primary Myfxbook source
-// https://www.myfxbook.com/members/adithyodw/tol-langit-etf-gold/12042787
+// TOL LANGIT ETF GOLD — Real (USD), IC Markets, MT5, 1:500 — XAUUSD + AUDCAD
 export const GOLD: SignalStats = {
   id: 'gold',
   name: 'TOL LANGIT ETF GOLD',
-  role: 'XAUUSD specialist · Volatility-adaptive',
-  broker: 'IC Markets Global',
-  account: '#12042787',
+  role: 'XAUUSD + AUDCAD · Volatility-adaptive',
+  broker: 'IC Markets',
+  brokerAccount: '7948454',
+  myfxbookAccountId: '12042787',
+  platform: 'MetaTrader 5',
   currency: 'USD',
-  growthPct: 348.70,
-  mql5GrowthPct: 350.25,
-  profit: 20418.55,
-  balance: 26218.55,
-  equity: 25840.10,
-  winRatePct: 78.60,
-  trades: 1247,
-  profitFactor: 3.12,
-  drawdownPct: 22.84,
-  monthlyPct: 18.42,
-  pairs: ['XAUUSD'],
-  pairAllocation: [{ pair: 'XAUUSD', weight: 100, color: '#b89a4e' }],
+  growthPct: 364.77,
+  absGainPct: 172.26,
+  dailyPct: 1.85,
+  monthlyPct: 72.65,
+  drawdownPct: 42.06,
+  balance: 25306.23,
+  equity: 25113.44,
+  profit: 20472.84,
+  trades: 434,
+  winRatePct: 78,
+  profitFactor: 2.61,
+  pairs: ['XAUUSD', 'AUDCAD'],
+  pairAllocation: [
+    { pair: 'XAUUSD', weight: 85, color: '#b89a4e' },
+    { pair: 'AUDCAD', weight: 15, color: '#0a1f3d' },
+  ],
   mql5Url: 'https://www.mql5.com/en/signals/2360336',
   myfxbookUrl: 'https://www.myfxbook.com/members/adithyodw/tol-langit-etf-gold/12042787',
-  myfxbookAccountId: '12042787',
+  myfxbookStatementUrl: 'https://www.myfxbook.com/secure/statements/12042787/statement.html',
   startedOn: '2025-02-09',
   lastUpdate: '2026-05-16',
 };
 
 export const ALL_SIGNALS: SignalStats[] = [V10, GOLD];
 
-// Build a fallback Myfxbook-shaped envelope from the constants above.
-// The sync layer uses this whenever the live API isn't reachable.
 export function buildFallbackAccounts(): MyfxbookAccount[] {
   const map = (s: SignalStats): MyfxbookAccount => ({
     id: Number(s.myfxbookAccountId),
@@ -105,11 +118,11 @@ export function buildFallbackAccounts(): MyfxbookAccount[] {
     name: s.name,
     description: s.role,
     gain: s.growthPct,
-    absGain: s.growthPct,
-    daily: 0.62,
+    absGain: s.absGainPct,
+    daily: s.dailyPct,
     monthly: s.monthlyPct,
     withdrawals: 0,
-    deposits: s.balance - s.profit,
+    deposits: 0,
     interest: 0,
     profit: s.profit,
     balance: s.balance,
@@ -127,7 +140,7 @@ export function buildFallbackAccounts(): MyfxbookAccount[] {
     profitFactor: s.profitFactor,
     pips: 0,
     invitationUrl: s.myfxbookUrl,
-    serverName: 'IC Markets Global-Live',
+    serverName: s.broker,
     winRatePct: s.winRatePct,
     trades: s.trades,
     pairs: s.pairs,
@@ -137,16 +150,17 @@ export function buildFallbackAccounts(): MyfxbookAccount[] {
   return [map(V10), map(GOLD)];
 }
 
-// Hydrate a SignalStats from a possibly-updated Myfxbook account row.
 export function hydrateSignal(base: SignalStats, acc: MyfxbookAccount): SignalStats {
   return {
     ...base,
     growthPct: acc.gain ?? base.growthPct,
+    absGainPct: acc.absGain ?? base.absGainPct,
+    dailyPct: acc.daily ?? base.dailyPct,
+    monthlyPct: acc.monthly ?? base.monthlyPct,
     profit: acc.profit ?? base.profit,
     balance: acc.balance ?? base.balance,
     equity: acc.equity ?? base.equity,
     drawdownPct: acc.drawdown ?? base.drawdownPct,
-    monthlyPct: acc.monthly ?? base.monthlyPct,
     profitFactor: acc.profitFactor ?? base.profitFactor,
     winRatePct: acc.winRatePct ?? base.winRatePct,
     trades: acc.trades ?? base.trades,
@@ -156,8 +170,6 @@ export function hydrateSignal(base: SignalStats, acc: MyfxbookAccount): SignalSt
 
 export interface EquityPoint { t: number; v: number }
 
-// Realistic monotonically-trending equity curve scaled to real growth.
-// Used as a visual "model curve" since Myfxbook history endpoints require auth.
 export function buildEquityCurve(
   start: number,
   endGrowthPct: number,
@@ -188,7 +200,9 @@ export const OPERATOR = {
   handle: '@tol_langit',
   role: 'Systems operator · Discretionary risk',
   bio:
-    'Independent quant trader operating two Myfxbook-verified live signals since 2023. Discretionary risk overlay on top of fully systematic execution. No private capital pooling, no managed accounts — signal copy only.',
+    'Independent quant trader operating two Myfxbook-verified live trading accounts at IC Markets. ' +
+    'V10 (SGD/MT4) runs a multi-pair FX basket; ETF Gold (USD/MT5) trades XAUUSD with an AUDCAD overlay. ' +
+    'No private capital pooling, no managed accounts — public track record only.',
   links: {
     github: 'https://github.com/adithyodw',
     linkedin: 'https://www.linkedin.com/in/adithyodw',

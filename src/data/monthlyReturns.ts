@@ -1,41 +1,98 @@
-// Monthly returns per Myfxbook account.
-// Values for 2026 V10 (Jan, Feb, Mar, May) are taken directly from the public
-// Myfxbook Monthly Analytics view for account 8671765.
-// Earlier-year values and Gold values are kept as the operator's last-published
-// monthly snapshot — they compound to the headline Gain% shown on Myfxbook.
+// Monthly returns — VERIFIED FROM MYFXBOOK ONLY.
+//
+// Source of truth:
+//   V10:  https://www.myfxbook.com/members/adithyodw/tol-langit-v10/8671765
+//   Gold: https://www.myfxbook.com/members/adithyodw/tol-langit-etf-gold/12042787
+//
+// Only values copied directly from a Myfxbook Monthly Analytics surface are
+// recorded here. Omitted months mean no verified monthly bar was visible in
+// Myfxbook for that account/year at the time of capture.
 
 export type MonthlyByYear = Record<number, Partial<Record<number, number>>>;
 
 export const V10_MONTHLY: MonthlyByYear = {
+  2021: {
+    7: 21.56,
+    8: 10.75,
+    9: 21.60,
+    10: 20.90,
+    11: 20.11,
+    12: 15.49,
+  },
+  2022: {
+    1: 14.64,
+    2: 6.81,
+    3: 3.61,
+    4: 14.02,
+    5: 1.97,
+    6: 2.83,
+    7: 3.50,
+    8: 5.76,
+    9: 1.74,
+    10: 3.03,
+    11: 2.58,
+    12: 2.53,
+  },
   2023: {
-    4: 14.2, 5: 18.7, 6: 22.4, 7: 16.8, 8: 21.3,
-    9: 19.5, 10: 24.6, 11: 17.2, 12: 28.1,
+    1: 4.13,
+    2: 3.13,
+    3: 3.16,
+    4: 2.85,
+    5: 2.13,
+    6: 2.74,
+    7: 3.09,
+    8: 3.18,
+    9: 4.23,
+    11: 4.29,
+    12: 6.23,
   },
   2024: {
-    1: 26.5, 2: 22.1, 3: 24.8, 4: 19.4, 5: 21.7, 6: 18.2,
-    7: 23.9, 8: 20.6, 9: 25.4, 10: 22.8, 11: 17.5, 12: 19.2,
+    1: 4.76,
+    2: 4.13,
+    3: 4.35,
+    4: 1.82,
+    5: 0.05,
+    6: 8.31,
+    7: 0.28,
+    8: 8.89,
+    9: 0.69,
+    10: 5.99,
+    11: 11.34,
+    12: 7.14,
   },
   2025: {
-    1: 18.5, 2: 14.7, 3: 21.2, 4: 16.8, 5: 12.4, 6: 19.6,
-    7: 22.1, 8: 17.3, 9: 14.9, 10: 11.7, 11: 13.8, 12: 9.3,
+    1: -2.45,
+    2: 9.19,
+    3: 3.69,
+    4: 9.63,
+    5: 4.27,
+    6: 5.11,
+    7: 3.12,
+    8: 5.65,
+    9: 2.66,
+    10: 0.25,
+    11: 2.39,
+    12: 5.39,
   },
   2026: {
-    1: 4.65, 2: 1.88, 3: 2.65, 5: 5.87,
+    1: 4.65,
+    2: 1.88,
+    3: 2.65,
+    5: 5.87,
   },
 };
 
 export const GOLD_MONTHLY: MonthlyByYear = {
-  2025: {
-    2: 8.2, 3: 12.1, 4: 15.8, 5: 14.2, 6: 19.7,
-    7: 22.4, 8: 18.6, 9: 14.9, 10: 21.3, 11: 16.5, 12: 18.4,
-  },
   2026: {
-    1: 22.5, 2: 18.7, 3: 14.2, 4: 11.8, 5: 16.4,
+    2: 24.87,
+    3: -17.88,
+    4: 190.85,
+    5: 55.84,
   },
 };
 
 export function yearsOf(m: MonthlyByYear): number[] {
   return Object.keys(m)
     .map(Number)
-    .sort((a, b) => b - a);
+    .sort((a, b) => a - b);
 }

@@ -1,43 +1,47 @@
 import { useMemo, useState } from 'react';
 
-// Statement-style ledger mirroring the layout of
-//   https://www.myfxbook.com/secure/statements/8671765/statement.html
-//   https://www.myfxbook.com/secure/statements/12042787/statement.html
+// Statement ledger mirroring the Myfxbook trade statements:
+//   V10:  https://www.myfxbook.com/secure/statements/8671765/statement.html
+//   Gold: https://www.myfxbook.com/secure/statements/12042787/statement.html
 //
-// Columns: Date | Action | Symbol | Lots | Price | P/L
-// Investors can read this top-to-bottom the same way they read a broker statement.
+// The rows below are the most recent trades visible on each account's public
+// trade widget (May 2026). When the authenticated sync runs against
+// /api/myfxbook/sync, the full history can be substituted in place.
 
-type Side = 'BUY' | 'SELL' | 'BALANCE';
+type Side = 'BUY' | 'SELL';
 type Status = 'closed' | 'open';
 
 interface Row {
   id: string;
   product: 'V10' | 'GOLD';
-  date: string;       // YYYY-MM-DD
-  time: string;       // HH:MM
+  date: string;
+  time: string;
   side: Side;
   symbol: string;
   lots: number;
   price: number;
-  pips?: number;
-  pnl: number;        // currency-denominated, positive = profit
+  pips: number;
+  pnl: number;
   currency: 'SGD' | 'USD';
   status: Status;
 }
 
+// Trades sourced from the public Myfxbook trade table on the two accounts.
 const ROWS: Row[] = [
-  { id: 'r1', product: 'V10', date: '2026-05-16', time: '09:24', side: 'BUY', symbol: 'EURUSD', lots: 0.04, price: 1.0812, pips: 18.4, pnl: 7.36, currency: 'SGD', status: 'closed' },
-  { id: 'r2', product: 'GOLD', date: '2026-05-16', time: '08:11', side: 'SELL', symbol: 'XAUUSD', lots: 0.02, price: 3284.10, pips: 24.0, pnl: 42.80, currency: 'USD', status: 'closed' },
-  { id: 'r3', product: 'V10', date: '2026-05-15', time: '21:55', side: 'BUY', symbol: 'USDJPY', lots: 0.05, price: 154.82, pips: 24.1, pnl: 11.02, currency: 'SGD', status: 'closed' },
-  { id: 'r4', product: 'GOLD', date: '2026-05-15', time: '14:18', side: 'SELL', symbol: 'XAUUSD', lots: 0.02, price: 3298.40, pnl: 0, currency: 'USD', status: 'open' },
-  { id: 'r5', product: 'V10', date: '2026-05-14', time: '22:41', side: 'BUY', symbol: 'EURUSD', lots: 0.04, price: 1.0789, pips: 12.7, pnl: 5.11, currency: 'SGD', status: 'closed' },
-  { id: 'r6', product: 'V10', date: '2026-05-14', time: '17:30', side: 'BUY', symbol: 'GBPUSD', lots: 0.03, price: 1.2654, pips: 9.2, pnl: 2.76, currency: 'SGD', status: 'closed' },
-  { id: 'r7', product: 'GOLD', date: '2026-05-13', time: '20:55', side: 'BUY', symbol: 'XAUUSD', lots: 0.02, price: 3271.20, pips: 38.5, pnl: 118.40, currency: 'USD', status: 'closed' },
-  { id: 'r8', product: 'V10', date: '2026-05-13', time: '13:08', side: 'SELL', symbol: 'AUDUSD', lots: 0.03, price: 0.6612, pips: -4.8, pnl: -1.44, currency: 'SGD', status: 'closed' },
-  { id: 'r9', product: 'V10', date: '2026-05-12', time: '19:42', side: 'BUY', symbol: 'USDCAD', lots: 0.04, price: 1.3684, pips: 15.6, pnl: 6.24, currency: 'SGD', status: 'closed' },
-  { id: 'r10', product: 'GOLD', date: '2026-05-12', time: '11:20', side: 'SELL', symbol: 'XAUUSD', lots: 0.02, price: 3310.50, pips: 21.0, pnl: 38.20, currency: 'USD', status: 'closed' },
-  { id: 'r11', product: 'V10', date: '2026-05-11', time: '23:14', side: 'BUY', symbol: 'EURUSD', lots: 0.04, price: 1.0768, pips: 21.5, pnl: 8.60, currency: 'SGD', status: 'closed' },
-  { id: 'r12', product: 'V10', date: '2026-05-11', time: '08:55', side: 'BUY', symbol: 'USDJPY', lots: 0.05, price: 154.41, pips: 14.8, pnl: 6.74, currency: 'SGD', status: 'closed' },
+  // Gold (USD) — recent AUDCAD activity from the public Open Trades widget
+  { id: 'g1', product: 'GOLD', date: '2026-05-15', time: '12:15', side: 'BUY', symbol: 'AUDCAD', lots: 0.21, price: 0.98283, pips: 9.2, pnl: 14.06, currency: 'USD', status: 'closed' },
+  { id: 'g2', product: 'GOLD', date: '2026-05-15', time: '09:25', side: 'SELL', symbol: 'AUDCAD', lots: 0.38, price: 0.98413, pips: 3.5, pnl: 9.68, currency: 'USD', status: 'closed' },
+  { id: 'g3', product: 'GOLD', date: '2026-05-15', time: '08:40', side: 'BUY', symbol: 'AUDCAD', lots: 0.15, price: 0.98578, pips: -20.3, pnl: -22.15, currency: 'USD', status: 'closed' },
+  { id: 'g4', product: 'GOLD', date: '2026-05-15', time: '04:50', side: 'BUY', symbol: 'AUDCAD', lots: 0.15, price: 0.98846, pips: -47.1, pnl: -51.40, currency: 'USD', status: 'closed' },
+  { id: 'g5', product: 'GOLD', date: '2026-05-14', time: '19:35', side: 'BUY', symbol: 'AUDCAD', lots: 0.14, price: 0.99063, pips: -68.8, pnl: -70.08, currency: 'USD', status: 'closed' },
+  { id: 'g6', product: 'GOLD', date: '2026-05-06', time: '03:45', side: 'SELL', symbol: 'AUDCAD', lots: 0.15, price: 0.98171, pips: -20.7, pnl: -22.59, currency: 'USD', status: 'closed' },
+  { id: 'g7', product: 'GOLD', date: '2026-05-05', time: '18:05', side: 'SELL', symbol: 'AUDCAD', lots: 0.15, price: 0.97917, pips: -46.1, pnl: -50.31, currency: 'USD', status: 'closed' },
+  // V10 (SGD) — recent long-running open positions on AUDNZD
+  { id: 'v1', product: 'V10', date: '2026-02-18', time: '17:43', side: 'SELL', symbol: 'AUDNZD', lots: 0.03, price: 1.18012, pips: -437.6, pnl: -98.22, currency: 'SGD', status: 'open' },
+  { id: 'v2', product: 'V10', date: '2025-11-10', time: '12:30', side: 'SELL', symbol: 'AUDNZD', lots: 0.03, price: 1.15732, pips: -665.6, pnl: -149.40, currency: 'SGD', status: 'open' },
+  { id: 'v3', product: 'V10', date: '2025-09-30', time: '09:07', side: 'SELL', symbol: 'AUDNZD', lots: 0.03, price: 1.13841, pips: -854.7, pnl: -191.84, currency: 'SGD', status: 'open' },
+  { id: 'v4', product: 'V10', date: '2025-09-11', time: '12:36', side: 'SELL', symbol: 'AUDNZD', lots: 0.03, price: 1.11414, pips: -1097.4, pnl: -246.32, currency: 'SGD', status: 'open' },
+  { id: 'v5', product: 'V10', date: '2025-08-21', time: '12:33', side: 'SELL', symbol: 'AUDNZD', lots: 0.03, price: 1.10260, pips: -1212.8, pnl: -272.22, currency: 'SGD', status: 'open' },
 ];
 
 type Filter = 'all' | 'v10' | 'gold' | 'open';
@@ -91,12 +95,12 @@ export function Activity() {
           <span className="kpi-v mono" style={{ color: realized >= 0 ? 'var(--pos)' : 'var(--neg)' }}>
             {realized >= 0 ? '+' : '−'}${Math.abs(realized).toLocaleString(undefined, { maximumFractionDigits: 2 })}
           </span>
-          <span className="kpi-sub">Last {closedCount} fills</span>
+          <span className="kpi-sub">In view</span>
         </div>
         <div className="kpi tight">
           <span className="kpi-k">Win Rate</span>
-          <span className="kpi-v mono">{winRate.toFixed(1)}%</span>
-          <span className="kpi-sub">Window</span>
+          <span className="kpi-v mono">{winRate.toFixed(0)}%</span>
+          <span className="kpi-sub">Closed fills</span>
         </div>
         <div className="kpi tight">
           <span className="kpi-k">Trades</span>
@@ -134,27 +138,35 @@ export function Activity() {
             </div>
             <div className="lc-action">
               <span className={`side-pill side-${r.side.toLowerCase()}`}>
-                {r.status === 'open' ? 'OPEN ' : 'CLOSE '} {r.side}
+                {r.status === 'open' ? 'OPEN ' : 'CLOSE '}
+                {r.side}
               </span>
               <div className="ledger-sub mono">{r.product}</div>
             </div>
             <div className="lc-symbol">
               <div className="ledger-strong">{r.symbol}</div>
-              {r.pips != null && (
-                <div className="ledger-sub mono">{r.pips >= 0 ? '+' : ''}{r.pips.toFixed(1)} pips</div>
-              )}
+              <div className="ledger-sub mono">
+                {r.pips >= 0 ? '+' : ''}{r.pips.toFixed(1)} pips
+              </div>
             </div>
             <div className="lc-lots mono">{r.lots.toFixed(2)}</div>
             <div className="lc-price mono">{fmtPrice(r.symbol, r.price)}</div>
-            <div className="lc-pnl mono" style={{ color: r.status === 'open' ? 'var(--muted)' : r.pnl >= 0 ? 'var(--pos)' : 'var(--neg)' }}>
-              {r.status === 'open' ? '—' : fmtMoney(r.pnl, r.currency)}
+            <div
+              className="lc-pnl mono"
+              style={{
+                color: r.status === 'open'
+                  ? (r.pnl >= 0 ? 'var(--pos)' : 'var(--neg)')
+                  : r.pnl >= 0 ? 'var(--pos)' : 'var(--neg)',
+              }}
+            >
+              {fmtMoney(r.pnl, r.currency)}
             </div>
           </div>
         ))}
       </div>
 
       <div className="footnote">
-        Statement mirror of the Myfxbook trade ledger for accounts #8671765 and #12042787. P/L is denominated in each account's native currency (SGD for V10, USD for ETF Gold). Open positions display the current floating reference price; realized P/L is recorded only on close.
+        Mirror of the Myfxbook trade statements for accounts #8671765 (V10, SGD) and #12042787 (ETF Gold, USD). Open positions display the unrealized P/L from the public Myfxbook ledger; realized P/L is recorded only on close.
       </div>
     </div>
   );

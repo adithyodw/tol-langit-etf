@@ -6,14 +6,18 @@ interface Props {
   gold: SignalStats;
 }
 
-// Blended ETF allocation: half-weighted across the two underlying signal allocations.
+// ETF composite (50/50 weight): each product's instrument exposures halved.
 const BLENDED_ALLOC = [
-  { pair: 'EURUSD', weight: 16, color: '#0a1f3d' },
-  { pair: 'GBPUSD', weight: 12, color: '#1a6e54' },
-  { pair: 'USDJPY', weight: 9, color: '#b89a4e' },
-  { pair: 'AUDUSD', weight: 7, color: '#6b6862' },
-  { pair: 'USDCAD', weight: 6, color: '#a83a3a' },
-  { pair: 'XAUUSD', weight: 50, color: '#caa64a' },
+  { pair: 'XAUUSD', weight: 42, color: '#caa64a' },
+  { pair: 'EURUSD', weight: 12, color: '#0a1f3d' },
+  { pair: 'GBPUSD', weight: 9, color: '#1a6e54' },
+  { pair: 'AUDCAD', weight: 8, color: '#7E6BAE' },
+  { pair: 'USDJPY', weight: 7, color: '#b89a4e' },
+  { pair: 'AUDUSD', weight: 6, color: '#6b6862' },
+  { pair: 'USDCAD', weight: 5, color: '#a83a3a' },
+  { pair: 'AUDNZD', weight: 4.5, color: '#D97B7B' },
+  { pair: 'EURGBP', weight: 3.5, color: '#5B8DBE' },
+  { pair: 'NZDCAD', weight: 3, color: '#3DA38A' },
 ];
 
 export function Systems({ v10, gold }: Props) {
@@ -43,7 +47,7 @@ export function Systems({ v10, gold }: Props) {
         </div>
       </div>
 
-      <div className="section-label"><span>{v10.name} — FX Basket</span></div>
+      <div className="section-label"><span>{v10.name} — FX basket</span></div>
       <div className="card alloc-card">
         <AllocDonut data={v10.pairAllocation} size={108} thickness={16} />
         <div className="alloc-legend">
@@ -57,7 +61,7 @@ export function Systems({ v10, gold }: Props) {
         </div>
       </div>
 
-      <div className="section-label"><span>{gold.name} — Single Instrument</span></div>
+      <div className="section-label"><span>{gold.name} — XAUUSD + AUDCAD</span></div>
       <div className="card alloc-card">
         <AllocDonut data={gold.pairAllocation} size={108} thickness={16} />
         <div className="alloc-legend">
@@ -77,7 +81,7 @@ export function Systems({ v10, gold }: Props) {
           <div className="pillar-num mono">01</div>
           <div>
             <div className="pillar-h">Myfxbook-verified execution</div>
-            <div className="pillar-p">Every fill is mirrored to Myfxbook and shadow-tracked on MQL5. There is no off-book PnL.</div>
+            <div className="pillar-p">Every fill on broker accounts #{v10.brokerAccount} (V10) and #{gold.brokerAccount} (Gold) is mirrored to Myfxbook. There is no off-book PnL.</div>
           </div>
         </div>
         <div className="hr h" />
@@ -85,7 +89,7 @@ export function Systems({ v10, gold }: Props) {
           <div className="pillar-num mono">02</div>
           <div>
             <div className="pillar-h">Two uncorrelated engines</div>
-            <div className="pillar-p">V10 grids FX majors; ETF Gold trades XAUUSD volatility. The composite smooths the drawdowns of either engine alone.</div>
+            <div className="pillar-p">V10 grids FX majors on MT4 in SGD; ETF Gold trades XAUUSD with an AUDCAD overlay on MT5 in USD. The composite smooths the drawdowns of either engine alone.</div>
           </div>
         </div>
         <div className="hr h" />
@@ -99,7 +103,7 @@ export function Systems({ v10, gold }: Props) {
       </div>
 
       <div className="footnote">
-        Allocation weights are indicative of instrument exposure over the trailing 90 days. Real-time exposure rebalances continuously on each fill.
+        Allocation weights are indicative exposures over the trailing 90 days. Real-time exposure rebalances continuously on each fill.
       </div>
     </div>
   );

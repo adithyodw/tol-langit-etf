@@ -45,3 +45,14 @@ export interface SyncEnvelope {
   accounts: MyfxbookAccount[];
   notice?: string;         // human-readable reason if fallback was used
 }
+
+export interface MyfxbookSyncResponse {
+  success: boolean;
+  lastUpdated?: string;
+  message?: string;
+  useFallback?: boolean;
+  accounts?: {
+    v10?: Partial<MyfxbookAccount> & { openTrades?: unknown[] };
+    gold?: Partial<MyfxbookAccount> & { openTrades?: unknown[] };
+  };
+}

@@ -6,7 +6,7 @@
 // or auth missing) we surface the static fallback shipped in src/data/signals.ts.
 
 import { buildFallbackAccounts, V10, GOLD, hydrateSignal, SignalStats } from '../data/signals';
-import type { SyncEnvelope } from '../data/types';
+import type { MyfxbookAccount, MyfxbookSyncResponse, SyncEnvelope } from '../data/types';
 
 const SYNC_ENDPOINT = '/api/myfxbook/sync';
 const SYNC_TIMEOUT_MS = 8_000;
@@ -15,6 +15,8 @@ export interface SyncResult {
   envelope: SyncEnvelope;
   signals: { v10: SignalStats; gold: SignalStats };
 }
+
+type ApiAccount = NonNullable<NonNullable<MyfxbookSyncResponse['accounts']>['v10']>;
 
 function fallbackEnvelope(notice: string): SyncEnvelope {
   return {
@@ -35,6 +37,36 @@ function envelopeToSignals(env: SyncEnvelope): SyncResult['signals'] {
   };
 }
 
+function normalizeAccount(
+  base: MyfxbookAccount,
+  account: ApiAccount
+): MyfxbookAccount {
+  return {
+    ...base,
+    ...account,
+    id: Number(account?.id ?? base.id),
+    accountId: String(account?.accountId ?? account?.id ?? base.accountId),
+    name: account?.name ?? base.name,
+  };
+}
+
+function responseToEnvelope(payload: MyfxbookSyncResponse): SyncEnvelope {
+  if (!payload.success || payload.useFallback || !payload.accounts?.v10 || !payload.accounts?.gold) {
+    return fallbackEnvelope(payload.message ?? 'Live Myfxbook sync unavailable — showing last verified values.');
+  }
+
+  const [v10Base, goldBase] = buildFallbackAccounts();
+
+  return {
+    source: 'myfxbook-api',
+    syncedAt: payload.lastUpdated ?? new Date().toISOString(),
+    accounts: [
+      normalizeAccount(v10Base, payload.accounts.v10),
+      normalizeAccount(goldBase, payload.accounts.gold),
+    ],
+  };
+}
+
 export async function syncFromMyfxbook(): Promise<SyncResult> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), SYNC_TIMEOUT_MS);
@@ -45,8 +77,8 @@ export async function syncFromMyfxbook(): Promise<SyncResult> {
       signal: controller.signal,
     });
     if (!res.ok) throw new Error(`sync HTTP ${res.status}`);
-    const env = (await res.json()) as SyncEnvelope;
-    if (!env || !Array.isArray(env.accounts)) throw new Error('malformed sync envelope');
+    const payload = (await res.json()) as MyfxbookSyncResponse;
+    const env = responseToEnvelope(payload);
     return { envelope: env, signals: envelopeToSignals(env) };
   } catch (err: unknown) {
     const reason =
