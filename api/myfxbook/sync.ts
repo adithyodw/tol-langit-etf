@@ -375,20 +375,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const goldAccount = getAccount(accountsData, goldId);
 
     const v10Payload: NormalisedAccountPayload = {
-      id: v10Id,
-      name: 'TOL LANGIT V10',
       ...v10Account,
       ...v10Bundle.gain,
+      id: v10Id,
+      name: 'TOL LANGIT V10',
       openTrades: v10Bundle.open,
       history: v10Bundle.history,
       monthlyByYear: v10Bundle.monthlyByYear,
     };
 
     const goldPayload: NormalisedAccountPayload = {
-      id: goldId,
-      name: 'TOL LANGIT ETF GOLD',
       ...goldAccount,
       ...goldBundle.gain,
+      id: goldId,
+      name: 'TOL LANGIT ETF GOLD',
       openTrades: goldBundle.open,
       history: goldBundle.history,
       monthlyByYear: goldBundle.monthlyByYear,
