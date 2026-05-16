@@ -153,7 +153,7 @@ export function Dashboard({ v10, gold, onOpenSignal }: Props) {
         </div>
       </div>
       <div className="footnote sm-pad" style={{ paddingTop: 0 }}>
-        Pick a product, enter your capital, and choose a holding period. We replay the verified Myfxbook track for {selectedProduct.name} month-by-month against your number — the output is the balance an investor who had funded the same amount on day one would be holding today, before copy-trade fees.
+        Pick a product, set your capital, choose a holding period. We replay {selectedProduct.name}'s verified Myfxbook months against your number — the output is what a copy-trade investor funding the same amount on day one would hold today, before venue fees.
       </div>
       <div className="card no-pad">
         <SimulationPanel signal={selectedProduct} monthly={selectedMonthly} />
@@ -274,7 +274,7 @@ export function Dashboard({ v10, gold, onOpenSignal }: Props) {
       </div>
 
       <div className="footnote">
-        Every figure on this page is read live from Myfxbook — V10 (#{v10.myfxbookAccountId} · SGD) and ETF Gold (#{gold.myfxbookAccountId} · USD). Composite numbers are equal-weighted across both products; the underlying SGD and USD legs are not FX-normalised. Investors can replicate through MQL5, SignalStart, or ZuluTrade — see each product page for the live venue links. Past performance is not indicative of future results.
+        All figures read live from Myfxbook — V10 #{v10.myfxbookAccountId} · SGD and ETF Gold #{gold.myfxbookAccountId} · USD. Composite is equal-weighted; SGD/USD legs are not FX-normalised. Replicate via MQL5, SignalStart, or ZuluTrade. Past performance is not indicative of future results.
       </div>
     </div>
   );

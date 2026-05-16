@@ -338,13 +338,11 @@ export function SimulationPanel({ signal, monthly }: Props) {
       </div>
 
       <div className="sim-disclaimer">
-        Backtest against the verified Myfxbook track for {signal.name} (account #{signal.myfxbookAccountId}).
-        Each month's actual broker return is compounded onto your starting capital exactly as a copy-trade
-        investor would have experienced — no curated months, no edited history. Subscriber spreads, copier
-        latency, currency conversion, and venue fees sit outside the model. The "Verified max DD" shown is
-        the live peak-to-trough on the Myfxbook equity curve (the institutional risk number) — the monthly
-        replay only sees end-of-month balances and would otherwise understate intra-month risk. This is a
-        historical replay, not a projection or forecast — past performance is not indicative of future results.
+        Replay of the verified Myfxbook track for {signal.name} — actual monthly broker returns
+        compounded onto your capital. <strong>Verified max DD</strong> is the live peak-to-trough from
+        Myfxbook (the institutional risk number); the monthly replay does not capture intra-month risk.
+        Spreads, copier latency, FX conversion, and venue fees are excluded. Historical illustration
+        only — not a forecast.
       </div>
     </div>
   );

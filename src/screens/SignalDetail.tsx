@@ -83,6 +83,64 @@ export function SignalDetail({ signal: s, onBack }: Props) {
       </div>
 
       <div className="section-label">
+        <span>Strategy Factsheet</span>
+        <span className="section-right">ETF-style profile</span>
+      </div>
+      <div className="factsheet-stack" style={{ marginTop: 0 }}>
+        <div className="factsheet">
+          <div className="factsheet-head">
+            <span className="factsheet-dot" style={{ background: color }} />
+            <div className="factsheet-titleblock">
+              <div className="factsheet-product">{s.name}</div>
+              <div className="factsheet-meta mono">
+                {s.platform.toUpperCase()} · {s.currency} · #{s.myfxbookAccountId}
+              </div>
+            </div>
+          </div>
+          <div className="factsheet-cat">
+            <span className="factsheet-cat-k">Allocation Category</span>
+            <span className="factsheet-cat-v">{s.factsheet.category}</span>
+          </div>
+          <div className="factsheet-bullets">
+            {s.factsheet.bullets.map((b, i) => (
+              <p key={i}>{b}</p>
+            ))}
+          </div>
+          <div className="factsheet-risk">
+            <div className="factsheet-risk-h mono">RISK · MYFXBOOK VERIFIED</div>
+            <div className="factsheet-risk-grid">
+              <div className="factsheet-risk-cell">
+                <span className="factsheet-risk-k">Verified max DD</span>
+                <span className="factsheet-risk-v mono" style={{ color: 'var(--neg)' }}>
+                  −{s.drawdownPct.toFixed(2)}%
+                </span>
+              </div>
+              <div className="factsheet-risk-cell">
+                <span className="factsheet-risk-k">Profit factor</span>
+                <span className="factsheet-risk-v mono">{s.profitFactor.toFixed(2)}</span>
+              </div>
+              <div className="factsheet-risk-cell">
+                <span className="factsheet-risk-k">Win rate</span>
+                <span className="factsheet-risk-v mono">{s.winRatePct}%</span>
+              </div>
+              <div className="factsheet-risk-cell">
+                <span className="factsheet-risk-k">Trades</span>
+                <span className="factsheet-risk-v mono">{s.trades.toLocaleString()}</span>
+              </div>
+              <div className="factsheet-risk-cell">
+                <span className="factsheet-risk-k">Live since</span>
+                <span className="factsheet-risk-v mono">{s.startedOn}</span>
+              </div>
+              <div className="factsheet-risk-cell">
+                <span className="factsheet-risk-k">Track record</span>
+                <span className="factsheet-risk-v mono">{s.trackRecordYears}y</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="section-label">
         <span>Monthly Analytics</span>
         <span className="section-right">Per month</span>
       </div>
@@ -95,7 +153,7 @@ export function SignalDetail({ signal: s, onBack }: Props) {
         <span className="section-right">Historical replay</span>
       </div>
       <div className="footnote sm-pad" style={{ paddingTop: 0 }}>
-        Enter the capital you would deploy and the holding period you are evaluating. We replay the verified Myfxbook monthly track for {s.name} across that exact window, compounding each real return onto your starting balance — the output is the balance an investor who had funded the same amount on day one would be holding today.
+        Set your capital and a holding period — we replay {s.name}'s verified Myfxbook months across that window. Output is the balance a copy-trade investor funding the same amount on day one would be holding today.
       </div>
       <div className="card no-pad">
         <SimulationPanel signal={s} monthly={monthly} />
@@ -126,7 +184,7 @@ export function SignalDetail({ signal: s, onBack }: Props) {
         </div>
       </div>
       <div className="footnote sm-pad" style={{ paddingTop: 8 }}>
-        Every venue copies the same broker fills on account #{s.brokerAccount} at {s.broker} — there is no second strategy and no edited feed. Subscriber spreads, copier latency, and venue fees sit outside the published Myfxbook performance and are owed to whichever rail an investor selects.
+        Every venue copies the same fills on IC Markets account #{s.brokerAccount} — one strategy, one ledger, no edited feed. Spreads, copier latency, and venue fees sit outside the published Myfxbook performance.
       </div>
 
       <div className="section-label"><span>Performance</span></div>
@@ -184,7 +242,7 @@ export function SignalDetail({ signal: s, onBack }: Props) {
       </div>
 
       <div className="footnote">
-        Live broker account #{s.brokerAccount} at {s.broker} ({s.platform} · {s.currency}) is the single source of truth for {s.name}. Every fill is mirrored in real time to the public Myfxbook statement (account #{s.myfxbookAccountId}) — there is no separate book, no aggregated reporting, and no edited history. Past performance is not indicative of future results.
+        Single source of truth: {s.broker} account #{s.brokerAccount} ({s.platform} · {s.currency}), mirrored live to Myfxbook #{s.myfxbookAccountId}. No separate book, no edited history. Past performance is not indicative of future results.
       </div>
     </div>
   );

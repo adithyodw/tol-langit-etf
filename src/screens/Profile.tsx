@@ -82,7 +82,8 @@ export function Profile() {
 
       <div className="positioning">
         <div className="positioning-mark">"</div>
-        <p>Two live, ETF-style products, both verified on Myfxbook from the very first fill. No pooled capital, no managed accounts, no marketing track — only transparent broker execution you can audit before you replicate a single position.</p>
+        <p>Two live, ETF-style products — both verified on Myfxbook and shadow-tracked on MQL5 from the very first fill.</p>
+        <p>Without a Myfxbook account number, without an MQL5 signal page, there is no verification. A track record without a public broker statement is a marketing claim, not a track record. Audit before you replicate.</p>
         <div className="positioning-cite mono">— {OPERATOR.name.toUpperCase()}</div>
       </div>
 
@@ -118,69 +119,6 @@ export function Profile() {
             </div>
           ))}
         </div>
-      </div>
-
-      <div className="section-label">
-        <span>Strategy Factsheets</span>
-        <span className="section-right">ETF-style profiles</span>
-      </div>
-      <div className="footnote sm-pad" style={{ paddingTop: 0 }}>
-        How each product fits inside an institutional or qualified-retail portfolio. Every figure is sourced from the live Myfxbook account header — no marketing numbers.
-      </div>
-      <div className="factsheet-stack">
-        {PRODUCT_GROUPS.map((g) => (
-          <div key={g.signal.id} className="factsheet">
-            <div className="factsheet-head">
-              <span className="factsheet-dot" style={{ background: g.accent }} />
-              <div className="factsheet-titleblock">
-                <div className="factsheet-product">{g.signal.name}</div>
-                <div className="factsheet-meta mono">
-                  {g.signal.platform.toUpperCase()} · {g.signal.currency} · #{g.signal.myfxbookAccountId}
-                </div>
-              </div>
-            </div>
-            <div className="factsheet-cat">
-              <span className="factsheet-cat-k">Allocation Category</span>
-              <span className="factsheet-cat-v">{g.signal.factsheet.category}</span>
-            </div>
-            <div className="factsheet-bullets">
-              {g.signal.factsheet.bullets.map((b, i) => (
-                <p key={i}>{b}</p>
-              ))}
-            </div>
-            <div className="factsheet-risk">
-              <div className="factsheet-risk-h mono">RISK · MYFXBOOK VERIFIED</div>
-              <div className="factsheet-risk-grid">
-                <div className="factsheet-risk-cell">
-                  <span className="factsheet-risk-k">Verified max DD</span>
-                  <span className="factsheet-risk-v mono" style={{ color: 'var(--neg)' }}>
-                    −{g.signal.drawdownPct.toFixed(2)}%
-                  </span>
-                </div>
-                <div className="factsheet-risk-cell">
-                  <span className="factsheet-risk-k">Profit factor</span>
-                  <span className="factsheet-risk-v mono">{g.signal.profitFactor.toFixed(2)}</span>
-                </div>
-                <div className="factsheet-risk-cell">
-                  <span className="factsheet-risk-k">Win rate</span>
-                  <span className="factsheet-risk-v mono">{g.signal.winRatePct}%</span>
-                </div>
-                <div className="factsheet-risk-cell">
-                  <span className="factsheet-risk-k">Trades</span>
-                  <span className="factsheet-risk-v mono">{g.signal.trades.toLocaleString()}</span>
-                </div>
-                <div className="factsheet-risk-cell">
-                  <span className="factsheet-risk-k">Live since</span>
-                  <span className="factsheet-risk-v mono">{g.signal.startedOn}</span>
-                </div>
-                <div className="factsheet-risk-cell">
-                  <span className="factsheet-risk-k">Track record</span>
-                  <span className="factsheet-risk-v mono">{g.signal.trackRecordYears}y</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        ))}
       </div>
 
       <div className="section-label"><span>Broker</span></div>

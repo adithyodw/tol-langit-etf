@@ -110,9 +110,9 @@ export const V10: SignalStats = {
   factsheet: {
     category: 'Core Capital Preservation',
     bullets: [
-      'Suitable as a core systematic allocation prioritising capital preservation with steady compounding. Structurally analogous to a conservative fixed-income systematic strategy within a diversified portfolio.',
-      'Five-year live track since July 2021 across roughly 5,000 verified fills — the engine has experienced multiple regime breaks rather than a single benign sample.',
-      'Position sizing should respect the verified historical drawdown of ~70% on equity. The strategy is designed to be replicated with capital you have explicitly earmarked for systematic FX, not your operating cash.',
+      'Core systematic allocation — capital preservation with steady compounding. Structurally analogous to a conservative fixed-income strategy in a diversified book.',
+      'Five-year verified live track since July 2021. Multiple regime breaks already absorbed, not a single benign sample.',
+      'Historical equity drawdown above 70%. Replicate only with capital explicitly earmarked for systematic FX.',
     ],
   },
 };
@@ -164,9 +164,9 @@ export const GOLD: SignalStats = {
   factsheet: {
     category: 'Gold Specialist Growth Satellite',
     bullets: [
-      'XAU/USD focused growth strategy delivering +350.25% in its first three months with no grid mechanics. Profit factor of 2.55 across 430 verified trades confirms a structurally sound institutional-grade risk profile.',
-      'Monthly gain of +236.80% demonstrates exceptional return generation potential with near-intraday scalping efficiency. Balance drawdown of 40.32% reflects the intensity of rapid gold-specialist execution; equity drawdown of 39.64% is aligned with intra-period XAU/USD volatility.',
-      'The three-month maturation milestone has been exceeded with compelling returns — formal strategic allocation appropriate with disciplined position sizing and elevated leverage awareness.',
+      'High-octane satellite — pure XAU/USD directional execution with an AUDCAD overlay. No grid, no martingale.',
+      'Near-intraday scalping efficiency on the live broker statement. Equity drawdown reflects gold-specialist intensity, not over-leverage.',
+      'Three-month maturation cleared. Appropriate as a satellite sleeve with disciplined position sizing and elevated leverage awareness.',
     ],
   },
 };
@@ -262,10 +262,10 @@ export const OPERATOR = {
   handle: '@tol_langit',
   role: 'Principal · Systematic execution & risk',
   bio: [
-    'Independent systematic operator running two live, Myfxbook-verified trading accounts at IC Markets.',
-    'V10 (SGD · MT4) — a multi-pair FX basket with a five-year live track record since July 2021.',
-    'ETF Gold (USD · MT5) — XAUUSD with an AUDCAD overlay.',
-    'No pooled capital, no managed accounts, no marketing track. Every fill is mirrored to a public statement, so investors audit the same numbers their copy-trade subscription will execute against.',
+    'Independent systematic operator. Two live trading accounts at IC Markets, both verified on Myfxbook and shadow-tracked on MQL5.',
+    'V10 — multi-pair FX basket. SGD · MT4. Five-year verified live track since July 2021.',
+    'ETF Gold — XAUUSD with an AUDCAD overlay. USD · MT5.',
+    'No pooled capital. No managed accounts. No marketing track. The statement an investor audits is the statement their copy-trade rail executes against.',
   ],
   links: {
     github: 'https://github.com/adithyodw',
