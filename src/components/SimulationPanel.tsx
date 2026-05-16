@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { LineChart, Line, ResponsiveContainer, Tooltip, XAxis, YAxis, ReferenceLine } from 'recharts';
 import type { SignalStats } from '../data/signals';
 import type { MonthlyByYear } from '../data/monthlyReturns';
@@ -6,6 +6,12 @@ import type { MonthlyByYear } from '../data/monthlyReturns';
 interface Props {
   signal: SignalStats;
   monthly: MonthlyByYear;
+}
+
+function preferredHorizonKey(monthsAvailable: number): string {
+  if (monthsAvailable >= 12) return '12m';
+  if (monthsAvailable >= 6) return '6m';
+  return 'itd';
 }
 
 interface MonthlyPoint {
@@ -73,10 +79,21 @@ function clampCapital(n: number): number {
 export function SimulationPanel({ signal, monthly }: Props) {
   const series = useMemo(() => flattenMonthly(monthly), [monthly]);
   const [capital, setCapital] = useState<number>(10_000);
-  const [horizonKey, setHorizonKey] = useState<string>(series.length >= 12 ? '12m' : 'itd');
   const [capitalDraft, setCapitalDraft] = useState<string>('10000');
+  const [horizonKey, setHorizonKey] = useState<string>(() => preferredHorizonKey(series.length));
 
-  const horizon = HORIZONS.find((h) => h.key === horizonKey) ?? HORIZONS[0];
+  useEffect(() => {
+    setHorizonKey(preferredHorizonKey(series.length));
+  }, [signal.id, series.length]);
+
+  const horizonAvailability = useMemo(() => {
+    return HORIZONS.map((h) => ({
+      ...h,
+      fits: h.months === 'all' ? true : series.length >= h.months,
+    }));
+  }, [series.length]);
+
+  const horizon = horizonAvailability.find((h) => h.key === horizonKey) ?? horizonAvailability[horizonAvailability.length - 1];
 
   const slice = useMemo(() => {
     if (horizon.months === 'all') return series;
@@ -191,20 +208,25 @@ export function SimulationPanel({ signal, monthly }: Props) {
         <div className="sim-field">
           <label className="sim-label">Holding period</label>
           <div className="sim-seg" role="tablist">
-            {HORIZONS.map((h) => (
+            {horizonAvailability.map((h) => (
               <button
                 key={h.key}
                 type="button"
                 role="tab"
                 aria-selected={horizonKey === h.key}
-                className={`sim-seg-btn ${horizonKey === h.key ? 'on' : ''}`}
-                onClick={() => setHorizonKey(h.key)}
+                aria-disabled={!h.fits}
+                disabled={!h.fits}
+                title={!h.fits ? `Live track is shorter than ${h.label}` : undefined}
+                className={`sim-seg-btn ${horizonKey === h.key ? 'on' : ''} ${!h.fits ? 'off' : ''}`}
+                onClick={() => h.fits && setHorizonKey(h.key)}
               >
                 {h.label}
               </button>
             ))}
           </div>
-          <div className="sim-period mono">{periodLabel}</div>
+          <div className="sim-period mono">
+            {periodLabel} · {result.months} mo. live
+          </div>
         </div>
       </div>
 
@@ -316,10 +338,11 @@ export function SimulationPanel({ signal, monthly }: Props) {
       </div>
 
       <div className="sim-disclaimer">
-        Replay of the verified Myfxbook monthly track for {signal.name} (#{signal.myfxbookAccountId}),
-        compounded month-on-month against your input capital. Slippage, copy-trade fees, and currency
-        conversion are not modelled. Historical replay is illustrative only and not a forecast — past
-        performance is not indicative of future results.
+        Backtest against the verified Myfxbook track for {signal.name} (account #{signal.myfxbookAccountId}).
+        Each month's actual broker return is compounded onto your starting capital exactly as a copy-trade
+        investor would have experienced — no curated months, no edited history. Subscriber spreads, copier
+        latency, currency conversion, and venue fees sit outside the model. This is a historical replay,
+        not a projection or forecast — past performance is not indicative of future results.
       </div>
     </div>
   );

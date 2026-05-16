@@ -131,10 +131,29 @@ export function Dashboard({ v10, gold, onOpenSignal }: Props) {
 
       <div className="section-label">
         <span>Simulation</span>
-        <span className="section-right">{selected === 'v10' ? 'V10' : 'ETF Gold'} · historical replay</span>
+        <div className="seg" role="tablist" aria-label="Simulation product">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={selected === 'v10'}
+            className={`seg-btn ${selected === 'v10' ? 'on' : ''}`}
+            onClick={() => setSelected('v10')}
+          >
+            V10
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={selected === 'gold'}
+            className={`seg-btn ${selected === 'gold' ? 'on' : ''}`}
+            onClick={() => setSelected('gold')}
+          >
+            ETF Gold
+          </button>
+        </div>
       </div>
       <div className="footnote sm-pad" style={{ paddingTop: 0 }}>
-        Position size your capital, pick a holding period, and replay the verified Myfxbook track for {selectedProduct.name}. The output is what an investor who had funded the same amount would be holding today, before copy-trade fees.
+        Pick a product, enter your capital, and choose a holding period. We replay the verified Myfxbook track for {selectedProduct.name} month-by-month against your number — the output is the balance an investor who had funded the same amount on day one would be holding today, before copy-trade fees.
       </div>
       <div className="card no-pad">
         <SimulationPanel signal={selectedProduct} monthly={selectedMonthly} />
@@ -255,7 +274,7 @@ export function Dashboard({ v10, gold, onOpenSignal }: Props) {
       </div>
 
       <div className="footnote">
-        All performance metrics are pulled live from Myfxbook (V10 #{v10.myfxbookAccountId} · SGD, ETF Gold #{gold.myfxbookAccountId} · USD). Composite figures are equal-weighted; the underlying currencies are not FX-normalised. Replication is available through MQL5, SignalStart, and ZuluTrade — see each product page for venue links. Past performance is not indicative of future results.
+        Every figure on this page is read live from Myfxbook — V10 (#{v10.myfxbookAccountId} · SGD) and ETF Gold (#{gold.myfxbookAccountId} · USD). Composite numbers are equal-weighted across both products; the underlying SGD and USD legs are not FX-normalised. Investors can replicate through MQL5, SignalStart, or ZuluTrade — see each product page for the live venue links. Past performance is not indicative of future results.
       </div>
     </div>
   );

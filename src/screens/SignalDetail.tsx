@@ -95,7 +95,7 @@ export function SignalDetail({ signal: s, onBack }: Props) {
         <span className="section-right">Historical replay</span>
       </div>
       <div className="footnote sm-pad" style={{ paddingTop: 0 }}>
-        Enter your starting capital and a holding period. We replay the verified Myfxbook monthly track for {s.name} over the same window — month-on-month compounding — so you can see what an investor who funded the same amount on day one would be holding today.
+        Enter the capital you would deploy and the holding period you are evaluating. We replay the verified Myfxbook monthly track for {s.name} across that exact window, compounding each real return onto your starting balance — the output is the balance an investor who had funded the same amount on day one would be holding today.
       </div>
       <div className="card no-pad">
         <SimulationPanel signal={s} monthly={monthly} />
@@ -126,7 +126,7 @@ export function SignalDetail({ signal: s, onBack }: Props) {
         </div>
       </div>
       <div className="footnote sm-pad" style={{ paddingTop: 8 }}>
-        All venues mirror the same broker fills on account #{s.brokerAccount} at {s.broker}. Subscriber spreads, copier latency, and venue fees are not part of the Myfxbook performance.
+        Every venue copies the same broker fills on account #{s.brokerAccount} at {s.broker} — there is no second strategy and no edited feed. Subscriber spreads, copier latency, and venue fees sit outside the published Myfxbook performance and are owed to whichever rail an investor selects.
       </div>
 
       <div className="section-label"><span>Performance</span></div>
@@ -184,7 +184,7 @@ export function SignalDetail({ signal: s, onBack }: Props) {
       </div>
 
       <div className="footnote">
-        Live broker account #{s.brokerAccount} at {s.broker} ({s.platform}, {s.currency}), publicly mirrored on Myfxbook as account #{s.myfxbookAccountId}. Every fill is tracked off the same statement — there is no separate book. Past performance is not indicative of future results.
+        Live broker account #{s.brokerAccount} at {s.broker} ({s.platform} · {s.currency}) is the single source of truth for {s.name}. Every fill is mirrored in real time to the public Myfxbook statement (account #{s.myfxbookAccountId}) — there is no separate book, no aggregated reporting, and no edited history. Past performance is not indicative of future results.
       </div>
     </div>
   );

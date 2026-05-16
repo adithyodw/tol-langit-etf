@@ -1,4 +1,4 @@
-import { OPERATOR, V10, GOLD } from '../data/signals';
+import { OPERATOR, V10, GOLD, type SignalStats } from '../data/signals';
 
 const MQL5_ICON = (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -21,21 +21,32 @@ const GENERIC_ICON = (
   </svg>
 );
 
-const VERIF_LINKS = [
-  { name: 'TOL LANGIT V10', sub: 'Myfxbook · Primary live tracker', href: V10.myfxbookUrl, icon: MYFX_ICON },
-  { name: 'TOL LANGIT ETF GOLD', sub: 'Myfxbook · Primary live tracker', href: GOLD.myfxbookUrl, icon: MYFX_ICON },
-  ...V10.copyVenues.map((v) => ({
-    name: 'TOL LANGIT V10',
-    sub: `${v.label} · ${v.hint}`,
-    href: v.href,
-    icon: v.label === 'MQL5' ? MQL5_ICON : GENERIC_ICON,
-  })),
-  ...GOLD.copyVenues.map((v) => ({
-    name: 'TOL LANGIT ETF GOLD',
-    sub: `${v.label} · ${v.hint}`,
-    href: v.href,
-    icon: v.label === 'MQL5' ? MQL5_ICON : GENERIC_ICON,
-  })),
+interface VerifRow {
+  label: string;
+  sub: string;
+  href: string;
+  icon: JSX.Element;
+}
+
+function buildProductRails(s: SignalStats): VerifRow[] {
+  return [
+    { label: 'Myfxbook', sub: 'Primary live tracker · single source of truth', href: s.myfxbookUrl, icon: MYFX_ICON },
+    ...s.copyVenues.map<VerifRow>((v) => ({
+      label: v.label,
+      sub: v.hint,
+      href: v.href,
+      icon: v.label === 'MQL5' ? MQL5_ICON : GENERIC_ICON,
+    })),
+  ];
+}
+
+const PRODUCT_GROUPS: Array<{
+  signal: SignalStats;
+  accent: string;
+  rails: VerifRow[];
+}> = [
+  { signal: V10, accent: '#0a1f3d', rails: buildProductRails(V10) },
+  { signal: GOLD, accent: '#b89a4e', rails: buildProductRails(GOLD) },
 ];
 
 const OP_LINKS = [
@@ -69,7 +80,7 @@ export function Profile() {
 
       <div className="positioning">
         <div className="positioning-mark">"</div>
-        <p>Two live ETF-style products, both fully verified on Myfxbook. No pooled capital, no managed accounts, no marketing track record — only transparent broker execution that you can audit before you replicate.</p>
+        <p>Two live, ETF-style products, both verified on Myfxbook from the very first fill. No pooled capital, no managed accounts, no marketing track — only transparent broker execution you can audit before you replicate a single position.</p>
         <div className="positioning-cite mono">— {OPERATOR.name.toUpperCase()}</div>
       </div>
 
@@ -79,15 +90,30 @@ export function Profile() {
       </div>
       <div className="card" style={{ padding: 0 }}>
         <div className="verif-list">
-          {VERIF_LINKS.map(l => (
-            <a key={l.href + l.sub} href={l.href} target="_blank" rel="noreferrer" className="verif-row clean">
-              <span className="verif-icon">{l.icon}</span>
-              <div className="verif-body">
-                <div className="verif-name">{l.name}</div>
-                <div className="verif-sub">{l.sub}</div>
+          {PRODUCT_GROUPS.map((g) => (
+            <div key={g.signal.id}>
+              <div className="verif-sys-h">
+                <span className="verif-sys-dot" style={{ background: g.accent }} />
+                <span className="verif-sys-name">{g.signal.name}</span>
+                <span className="verif-sys-meta mono">#{g.signal.myfxbookAccountId}</span>
               </div>
-              <span className="verif-chev">↗</span>
-            </a>
+              {g.rails.map((r) => (
+                <a
+                  key={r.href}
+                  href={r.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="verif-row clean"
+                >
+                  <span className="verif-icon">{r.icon}</span>
+                  <div className="verif-body">
+                    <div className="verif-name">{r.label}</div>
+                    <div className="verif-sub">{r.sub}</div>
+                  </div>
+                  <span className="verif-chev">↗</span>
+                </a>
+              ))}
+            </div>
           ))}
         </div>
       </div>
@@ -106,7 +132,7 @@ export function Profile() {
         <span className="verif-chev">↗</span>
       </a>
       <div className="footnote sm-pad">
-        Disclosure: the IC Markets link is an affiliate code. It does not change your spreads or commissions.
+        Disclosure — the IC Markets link is an affiliate code. It does not change your spreads, your commissions, or how the strategy executes on your account.
       </div>
 
       <div className="section-label"><span>Connect</span></div>
@@ -127,10 +153,10 @@ export function Profile() {
 
       <div className="section-label"><span>Risk Disclosure</span></div>
       <div className="card disclosure">
-        <p><span className="mono">01</span><span>Trading leveraged FX and CFDs carries a substantial risk of loss and is not suitable for every investor.</span></p>
-        <p><span className="mono">02</span><span>Past performance — including the Myfxbook, MQL5, SignalStart, and ZuluTrade figures shown — is not indicative of future results, and the Simulation tool is a historical replay, not a forecast.</span></p>
-        <p><span className="mono">03</span><span>V10 has historically experienced drawdowns above 70% of equity. Position size accordingly and never replicate beyond your loss tolerance.</span></p>
-        <p><span className="mono">04</span><span>Copy execution is the subscriber's responsibility. The operator does not custody client funds and is not authorised to receive discretionary mandates.</span></p>
+        <p><span className="mono">01</span><span>Trading leveraged FX and CFDs carries a substantial risk of loss and is not suitable for every investor. Capital can be lost in full.</span></p>
+        <p><span className="mono">02</span><span>Past performance — including all Myfxbook, MQL5, SignalStart, and ZuluTrade figures shown — is not indicative of future results. The Simulation tool is a historical replay, not a forecast.</span></p>
+        <p><span className="mono">03</span><span>V10 has historically experienced drawdowns above 70% of equity. Size positions accordingly and never replicate beyond your personal loss tolerance.</span></p>
+        <p><span className="mono">04</span><span>Copy execution remains the subscriber's responsibility. The operator does not custody client funds and is not authorised to accept discretionary mandates.</span></p>
       </div>
 
       <div className="footnote">© 2026 TOL LANGIT · For institutional and qualified retail reference only.</div>

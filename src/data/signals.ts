@@ -241,8 +241,9 @@ export const OPERATOR = {
   role: 'Principal · Systematic execution & risk',
   bio:
     'Independent systematic operator running two live, Myfxbook-verified trading accounts at IC Markets. ' +
-    'V10 (SGD · MT4) is a multi-pair FX basket with a five-year live track record since 2021; ETF Gold (USD · MT5) trades XAUUSD with an AUDCAD overlay. ' +
-    'No pooled capital, no managed accounts, no off-book PnL — every fill is mirrored to a public statement subscribers can audit before they replicate.',
+    'V10 (SGD · MT4) — a multi-pair FX basket with a five-year live track record since July 2021. ' +
+    'ETF Gold (USD · MT5) — XAUUSD with an AUDCAD overlay. ' +
+    'No pooled capital, no managed accounts, no marketing track. Every fill is mirrored to a public statement, so investors audit the same numbers their copy-trade subscription will execute against.',
   links: {
     github: 'https://github.com/adithyodw',
     linkedin: 'https://www.linkedin.com/in/adithyodw',

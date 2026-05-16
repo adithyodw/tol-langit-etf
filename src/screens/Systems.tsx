@@ -81,7 +81,7 @@ export function Systems({ v10, gold }: Props) {
           <div className="pillar-num mono">01</div>
           <div>
             <div className="pillar-h">Myfxbook-verified execution</div>
-            <div className="pillar-p">Every fill on broker accounts #{v10.brokerAccount} (V10) and #{gold.brokerAccount} (Gold) is mirrored to Myfxbook. There is no off-book PnL.</div>
+            <div className="pillar-p">Every fill on broker accounts #{v10.brokerAccount} (V10) and #{gold.brokerAccount} (Gold) is mirrored to Myfxbook within seconds. No off-book PnL, no manual editing of the published track — the statement an investor audits is the statement they replicate.</div>
           </div>
         </div>
         <div className="hr h" />
@@ -89,7 +89,7 @@ export function Systems({ v10, gold }: Props) {
           <div className="pillar-num mono">02</div>
           <div>
             <div className="pillar-h">Two uncorrelated engines</div>
-            <div className="pillar-p">V10 trades a multi-pair FX basket on MT4 in SGD with a five-year live track record; ETF Gold trades XAUUSD with an AUDCAD overlay on MT5 in USD. The composite smooths drawdowns from either engine in isolation.</div>
+            <div className="pillar-p">V10 trades a multi-pair FX basket on MT4 in SGD with a verified five-year live track since July 2021. ETF Gold trades XAUUSD with an AUDCAD overlay on MT5 in USD. Holding both products smooths the drawdowns either engine takes in isolation.</div>
           </div>
         </div>
         <div className="hr h" />
@@ -97,13 +97,13 @@ export function Systems({ v10, gold }: Props) {
           <div className="pillar-num mono">03</div>
           <div>
             <div className="pillar-h">Discretionary risk overlay</div>
-            <div className="pillar-p">Macro regime shifts trigger manual de-risking — the operator pauses systems rather than over-fitting them. The composite is a portfolio decision, not a black-box bet.</div>
+            <div className="pillar-p">When a macro regime breaks, the operator de-risks manually — systems are paused, never over-fitted to the last drawdown. The composite is a deliberate portfolio decision, not a black-box bet on a single curve.</div>
           </div>
         </div>
       </div>
 
       <div className="footnote">
-        Allocation weights shown are indicative exposures over the trailing 90 days, derived from the live broker statement. Real-time exposure rebalances continuously on each fill — the figures here are a snapshot, not a static mandate.
+        Allocation weights are indicative exposures over the trailing 90 trading days, derived directly from the live broker statement. Real-time exposure rebalances continuously on every fill, so this view is a snapshot, not a static mandate.
       </div>
     </div>
   );
