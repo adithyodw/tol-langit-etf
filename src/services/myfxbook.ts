@@ -9,6 +9,7 @@ import { buildFallbackAccounts, V10, GOLD, hydrateSignal, SignalStats } from '..
 import type {
   LiveAccountFeed,
   LiveMonthlyByYear,
+  LiveOrder,
   LiveTrade,
   MyfxbookAccount,
   MyfxbookSyncAccount,
@@ -66,6 +67,14 @@ function tagTrades(
   return trades.map((t) => ({ ...t, productId, currency }));
 }
 
+function tagOrders(
+  orders: LiveOrder[] | undefined,
+  productId: 'v10' | 'gold'
+): LiveOrder[] {
+  if (!Array.isArray(orders)) return [];
+  return orders.map((o) => ({ ...o, productId }));
+}
+
 function buildFeed(
   account: MyfxbookSyncAccount | undefined,
   productId: 'v10' | 'gold',
@@ -73,12 +82,14 @@ function buildFeed(
 ): LiveAccountFeed | undefined {
   if (!account) return undefined;
   const open = tagTrades(account.openTrades, productId, currency);
+  const orders = tagOrders(account.openOrders, productId);
   const history = tagTrades(account.history, productId, currency);
   const monthlyByYear: LiveMonthlyByYear = account.monthlyByYear ?? {};
-  if (!open.length && !history.length && Object.keys(monthlyByYear).length === 0) {
-    return undefined;
-  }
-  return { productId, open, history, monthlyByYear };
+  const hasAny =
+    open.length || orders.length || history.length ||
+    Object.keys(monthlyByYear).length > 0 || account.summary;
+  if (!hasAny) return undefined;
+  return { productId, open, orders, history, monthlyByYear, summary: account.summary };
 }
 
 function responseToEnvelope(payload: MyfxbookSyncResponse): SyncEnvelope {

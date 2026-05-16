@@ -82,6 +82,13 @@ function liveTradeToRow(
     currency,
     status,
     sortKey: dt.getTime(),
+    ticket: t.ticket || undefined,
+    sl: t.sl,
+    tp: t.tp,
+    swap: t.swap,
+    commission: t.commission,
+    openTime: t.openTime,
+    closeTime: t.closeTime ?? undefined,
   };
 }
 

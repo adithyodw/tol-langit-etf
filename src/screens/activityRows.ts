@@ -20,6 +20,13 @@ export interface ActivityRow {
   currency: string;
   status: ActivityStatus;
   sortKey: number;     // ms since epoch — newest first when sorted desc
+  ticket?: string;
+  sl?: number | null;
+  tp?: number | null;
+  swap?: number | null;
+  commission?: number | null;
+  openTime?: string;   // ISO — for closed rows
+  closeTime?: string;  // ISO — for closed rows
 }
 
 // Verified snapshot fallback (May 2026 capture from the public Myfxbook

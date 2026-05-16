@@ -9,15 +9,19 @@
 //   - get-my-accounts.json
 //   - get-gain.json
 //   - get-open-trades.json
+//   - get-open-orders.json
 //   - get-history.json
 //   - get-daily-gain.json
 //
 // What's returned per account (v10, gold):
-//   - Account header stats from get-my-accounts (gain, drawdown, etc.)
-//   - openTrades   — array of normalised open positions
-//   - history      — most recent N closed trades (newest first)
-//   - monthlyByYear— { [year]: { [month]: returnPct } } compounded from
-//                    daily-gain so the bar chart matches Myfxbook exactly.
+//   - summary       — account header (balance, equity, profit, deposits,
+//                     withdrawals, drawdown, profit factor, win rate, trades,
+//                     last update, leverage server) for the statement view
+//   - openTrades    — array of normalised open positions (sl, tp, swap...)
+//   - openOrders    — array of normalised pending orders
+//   - history       — most recent N closed trades (newest first, enriched)
+//   - monthlyByYear — { [year]: { [month]: returnPct } } compounded from
+//                     daily-gain so the bar chart matches Myfxbook exactly.
 import { VercelRequest, VercelResponse } from '@vercel/node';
 
 const BASE_URL = 'https://www.myfxbook.com/api';
@@ -25,7 +29,7 @@ const BASE_URL = 'https://www.myfxbook.com/api';
 const v10Id = 8671765;
 const goldId = 12042787;
 
-const HISTORY_LIMIT = 60;
+const HISTORY_LIMIT = 80;
 const DAILY_START = '2021-01-01';
 
 interface MyfxbookLoginResponse {
@@ -55,16 +59,61 @@ interface MyfxbookGenericResponse {
 
 export interface NormalisedTrade {
   ticket: string;
+  magicNumber: string;
   symbol: string;
   side: 'BUY' | 'SELL' | 'BAL';
   status: 'open' | 'closed';
-  openTime: string;       // ISO timestamp ("YYYY-MM-DDTHH:mm:ssZ" approximation)
+  openTime: string;             // ISO timestamp
   closeTime: string | null;
   openPrice: number;
   closePrice: number | null;
   lots: number;
   pips: number;
   profit: number;
+  sl: number | null;
+  tp: number | null;
+  swap: number | null;
+  commission: number | null;
+  comment?: string;
+}
+
+export interface NormalisedOrder {
+  ticket: string;
+  magicNumber: string;
+  symbol: string;
+  action: string;               // raw action string (e.g. "Buy Limit")
+  side: 'BUY' | 'SELL';
+  type: 'LIMIT' | 'STOP' | 'OTHER';
+  openTime: string;
+  openPrice: number;
+  lots: number;
+  sl: number | null;
+  tp: number | null;
+  comment?: string;
+}
+
+export interface NormalisedSummary {
+  balance: number;
+  equity: number;
+  profit: number;
+  deposits: number;
+  withdrawals: number;
+  commission: number;
+  interest: number;
+  pips: number;
+  drawdown: number;
+  gain: number;
+  absGain: number;
+  daily: number;
+  monthly: number;
+  profitFactor: number;
+  trades: number;
+  winRatePct: number;
+  currency: string;
+  server: string;
+  creationDate: string;
+  firstTradeDate: string;
+  lastUpdateDate: string;
 }
 
 export type MonthlyByYear = Record<string, Record<string, number>>;
@@ -72,7 +121,9 @@ export type MonthlyByYear = Record<string, Record<string, number>>;
 interface NormalisedAccountPayload {
   id: number;
   name: string;
+  summary: NormalisedSummary;
   openTrades: NormalisedTrade[];
+  openOrders: NormalisedOrder[];
   history: NormalisedTrade[];
   monthlyByYear: MonthlyByYear;
   [key: string]: unknown;
@@ -95,18 +146,16 @@ function todayIso(): string {
 }
 
 // Myfxbook timestamps come in a couple of shapes — normalise to ISO when we can.
-// Supported: "YYYY-MM-DD HH:mm:ss", "MM/DD/YYYY HH:mm", "DD/MM/YYYY HH:mm".
+// Supported: "YYYY-MM-DD HH:mm:ss", "MM/DD/YYYY HH:mm", ISO.
 function parseDateLoose(input: unknown): Date | null {
   if (input == null) return null;
   if (typeof input !== 'string' && typeof input !== 'number') return null;
   const raw = String(input).trim();
   if (!raw) return null;
 
-  // Native parse first (handles ISO).
   const native = Date.parse(raw);
   if (!Number.isNaN(native)) return new Date(native);
 
-  // YYYY-MM-DD or YYYY-MM-DD HH:mm:ss
   const isoLike = raw.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:[ T](\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?$/);
   if (isoLike) {
     const [, y, m, d, h = '0', mn = '0', sc = '0'] = isoLike;
@@ -114,7 +163,6 @@ function parseDateLoose(input: unknown): Date | null {
     return Number.isNaN(dt.getTime()) ? null : dt;
   }
 
-  // MM/DD/YYYY HH:mm  — Myfxbook English account default
   const usSlash = raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:[ T](\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?$/);
   if (usSlash) {
     const [, m, d, y, h = '0', mn = '0', sc = '0'] = usSlash;
@@ -143,11 +191,31 @@ function num(v: unknown, fallback = 0): number {
   return fallback;
 }
 
+function numOrNull(v: unknown): number | null {
+  if (v == null) return null;
+  const n = num(v, NaN);
+  return Number.isFinite(n) ? n : null;
+}
+
+// SL/TP of 0 means "not set" in MetaTrader, normalise to null.
+function priceOrNull(v: unknown): number | null {
+  const n = numOrNull(v);
+  return n === null || n === 0 ? null : n;
+}
+
 function parseSide(action: unknown): NormalisedTrade['side'] {
   const a = String(action ?? '').trim().toLowerCase();
   if (a.startsWith('buy')) return 'BUY';
   if (a.startsWith('sell')) return 'SELL';
   return 'BAL';
+}
+
+function parseOrderAction(action: unknown): { side: 'BUY' | 'SELL'; type: 'LIMIT' | 'STOP' | 'OTHER' } {
+  const a = String(action ?? '').trim().toLowerCase();
+  const side: 'BUY' | 'SELL' = a.startsWith('sell') ? 'SELL' : 'BUY';
+  if (a.includes('limit')) return { side, type: 'LIMIT' };
+  if (a.includes('stop')) return { side, type: 'STOP' };
+  return { side, type: 'OTHER' };
 }
 
 function parseLots(sizing: unknown, fallback = 0): number {
@@ -163,6 +231,8 @@ function parseLots(sizing: unknown, fallback = 0): number {
 
 interface RawTrade {
   ticket?: unknown;
+  openTicket?: unknown;
+  closeTicket?: unknown;
   magicNumber?: unknown;
   openTime?: unknown;
   closeTime?: unknown;
@@ -174,7 +244,27 @@ interface RawTrade {
   closePrice?: unknown;
   pips?: unknown;
   profit?: unknown;
+  sl?: unknown;
+  tp?: unknown;
+  swap?: unknown;
+  commission?: unknown;
+  comment?: unknown;
   [key: string]: unknown;
+}
+
+function pickTicket(raw: RawTrade): string {
+  const t = raw.ticket ?? raw.openTicket ?? raw.closeTicket ?? '';
+  return String(t);
+}
+
+function pickMagic(raw: RawTrade): string {
+  return String(raw.magicNumber ?? '');
+}
+
+function pickComment(raw: RawTrade): string | undefined {
+  if (raw.comment == null) return undefined;
+  const s = String(raw.comment).trim();
+  return s ? s : undefined;
 }
 
 function normaliseTrade(raw: RawTrade, status: NormalisedTrade['status']): NormalisedTrade {
@@ -183,7 +273,8 @@ function normaliseTrade(raw: RawTrade, status: NormalisedTrade['status']): Norma
   const sizing = raw.sizing != null ? raw.sizing : raw.lots;
 
   return {
-    ticket: String(raw.ticket ?? raw.magicNumber ?? ''),
+    ticket: pickTicket(raw),
+    magicNumber: pickMagic(raw),
     symbol: String(raw.symbol ?? '').trim().toUpperCase(),
     side: parseSide(raw.action),
     status,
@@ -194,13 +285,38 @@ function normaliseTrade(raw: RawTrade, status: NormalisedTrade['status']): Norma
     lots: parseLots(sizing),
     pips: num(raw.pips),
     profit: num(raw.profit),
+    sl: priceOrNull(raw.sl),
+    tp: priceOrNull(raw.tp),
+    swap: numOrNull(raw.swap),
+    commission: numOrNull(raw.commission),
+    comment: pickComment(raw),
   };
 }
 
-function extractTradeArray(payload: MyfxbookGenericResponse, key: 'history' | 'openTrades'): RawTrade[] {
+function normaliseOrder(raw: RawTrade): NormalisedOrder {
+  const openTimeIso = toIsoOrFallback(raw.openTime, new Date(0).toISOString());
+  const sizing = raw.sizing != null ? raw.sizing : raw.lots;
+  const { side, type } = parseOrderAction(raw.action);
+
+  return {
+    ticket: pickTicket(raw),
+    magicNumber: pickMagic(raw),
+    symbol: String(raw.symbol ?? '').trim().toUpperCase(),
+    action: String(raw.action ?? '').trim(),
+    side,
+    type,
+    openTime: openTimeIso,
+    openPrice: num(raw.openPrice),
+    lots: parseLots(sizing),
+    sl: priceOrNull(raw.sl),
+    tp: priceOrNull(raw.tp),
+    comment: pickComment(raw),
+  };
+}
+
+function extractTradeArray(payload: MyfxbookGenericResponse, key: string): RawTrade[] {
   const value = payload?.[key];
   if (Array.isArray(value)) return value as RawTrade[];
-  // Some endpoints nest the array (e.g. dataDaily). Be defensive.
   if (Array.isArray((payload as { trades?: unknown })?.trades)) {
     return (payload as { trades: RawTrade[] }).trades;
   }
@@ -208,7 +324,7 @@ function extractTradeArray(payload: MyfxbookGenericResponse, key: 'history' | 'o
 }
 
 interface DailyGainPoint {
-  ymKey: string; // "YYYY-MM"
+  ymKey: string;
   gainPct: number;
 }
 
@@ -222,7 +338,6 @@ interface RawDailyEntry {
 function flattenDailyGain(payload: MyfxbookGenericResponse): RawDailyEntry[] {
   const series = (payload?.dailyGain ?? payload?.daily_gain ?? []) as unknown;
   if (!Array.isArray(series)) return [];
-  // Myfxbook returns dataDaily / dailyGain as either a flat array or array-of-arrays.
   const flat: RawDailyEntry[] = [];
   for (const slot of series as Array<unknown>) {
     if (Array.isArray(slot)) {
@@ -290,19 +405,55 @@ async function safeJson<T>(promise: Promise<Response>): Promise<T | null> {
   }
 }
 
+function buildSummary(
+  account: MyfxbookAccount,
+  gain: MyfxbookAccount,
+  history: NormalisedTrade[]
+): NormalisedSummary {
+  const closedCount = history.filter((t) => t.status === 'closed').length;
+  const winners = history.filter((t) => t.status === 'closed' && t.profit > 0).length;
+  const winRatePct = closedCount ? Math.round((winners / closedCount) * 1000) / 10 : 0;
+
+  return {
+    balance: num(gain.balance ?? account.balance),
+    equity: num(gain.equity ?? account.equity),
+    profit: num(gain.profit ?? account.profit),
+    deposits: num(account.deposits),
+    withdrawals: num(account.withdrawals),
+    commission: num(account.commission),
+    interest: num(account.interest),
+    pips: num(account.pips),
+    drawdown: num(gain.drawdown ?? account.drawdown),
+    gain: num(gain.gain ?? account.gain),
+    absGain: num(gain.absGain ?? account.absGain),
+    daily: num(gain.daily ?? account.daily),
+    monthly: num(gain.monthly ?? account.monthly),
+    profitFactor: num(account.profitFactor),
+    trades: closedCount,
+    winRatePct,
+    currency: String(account.currency ?? ''),
+    server: String(account.serverName ?? ''),
+    creationDate: String(account.creationDate ?? ''),
+    firstTradeDate: String(account.firstTradeDate ?? ''),
+    lastUpdateDate: String(account.lastUpdateDate ?? ''),
+  };
+}
+
 async function fetchAccountBundle(
   session: string,
   accountId: number
 ): Promise<{
   gain: MyfxbookAccount;
   open: NormalisedTrade[];
+  orders: NormalisedOrder[];
   history: NormalisedTrade[];
   monthlyByYear: MonthlyByYear;
 }> {
   const today = todayIso();
-  const [gainRaw, openRaw, historyRaw, dailyRaw] = await Promise.all([
+  const [gainRaw, openRaw, ordersRaw, historyRaw, dailyRaw] = await Promise.all([
     safeJson<MyfxbookAccount>(fetch(`${BASE_URL}/get-gain.json?session=${session}&id=${accountId}`)),
     safeJson<MyfxbookGenericResponse>(fetch(`${BASE_URL}/get-open-trades.json?session=${session}&id=${accountId}`)),
+    safeJson<MyfxbookGenericResponse>(fetch(`${BASE_URL}/get-open-orders.json?session=${session}&id=${accountId}`)),
     safeJson<MyfxbookGenericResponse>(fetch(`${BASE_URL}/get-history.json?session=${session}&id=${accountId}`)),
     safeJson<MyfxbookGenericResponse>(
       fetch(`${BASE_URL}/get-daily-gain.json?session=${session}&id=${accountId}&start=${DAILY_START}&end=${today}`)
@@ -310,12 +461,14 @@ async function fetchAccountBundle(
   ]);
 
   const open = (openRaw ? extractTradeArray(openRaw, 'openTrades') : []).map((t) => normaliseTrade(t, 'open'));
+  const orders = (ordersRaw ? extractTradeArray(ordersRaw, 'openOrders') : []).map((o) => normaliseOrder(o));
   const history = (historyRaw ? extractTradeArray(historyRaw, 'history') : []).map((t) => normaliseTrade(t, 'closed'));
   const monthlyByYear = dailyRaw ? aggregateMonthly(normaliseDaily(dailyRaw)) : {};
 
   return {
     gain: gainRaw ?? {},
     open,
+    orders,
     history: sortAndLimitHistory(history),
     monthlyByYear,
   };
@@ -373,12 +526,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const v10Account = getAccount(accountsData, v10Id);
     const goldAccount = getAccount(accountsData, goldId);
 
+    const v10Summary = buildSummary(v10Account, v10Bundle.gain, v10Bundle.history);
+    const goldSummary = buildSummary(goldAccount, goldBundle.gain, goldBundle.history);
+
     const v10Payload: NormalisedAccountPayload = {
       ...v10Account,
       ...v10Bundle.gain,
       id: v10Id,
       name: 'TOL LANGIT V10',
+      summary: v10Summary,
       openTrades: v10Bundle.open,
+      openOrders: v10Bundle.orders,
       history: v10Bundle.history,
       monthlyByYear: v10Bundle.monthlyByYear,
     };
@@ -388,7 +546,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       ...goldBundle.gain,
       id: goldId,
       name: 'TOL LANGIT ETF GOLD',
+      summary: goldSummary,
       openTrades: goldBundle.open,
+      openOrders: goldBundle.orders,
       history: goldBundle.history,
       monthlyByYear: goldBundle.monthlyByYear,
     };

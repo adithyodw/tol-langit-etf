@@ -4,9 +4,11 @@ export type SyncSource = 'myfxbook-api' | 'fallback';
 
 export type TradeSide = 'BUY' | 'SELL' | 'BAL';
 export type TradeStatus = 'open' | 'closed';
+export type OrderType = 'LIMIT' | 'STOP' | 'OTHER';
 
 export interface LiveTrade {
   ticket: string;
+  magicNumber: string;
   symbol: string;
   side: TradeSide;
   status: TradeStatus;
@@ -17,8 +19,53 @@ export interface LiveTrade {
   lots: number;
   pips: number;
   profit: number;
+  sl: number | null;
+  tp: number | null;
+  swap: number | null;
+  commission: number | null;
+  comment?: string;
   productId?: 'v10' | 'gold';  // attached client-side
   currency?: string;           // attached client-side
+}
+
+export interface LiveOrder {
+  ticket: string;
+  magicNumber: string;
+  symbol: string;
+  action: string;
+  side: 'BUY' | 'SELL';
+  type: OrderType;
+  openTime: string;
+  openPrice: number;
+  lots: number;
+  sl: number | null;
+  tp: number | null;
+  comment?: string;
+  productId?: 'v10' | 'gold';
+}
+
+export interface LiveAccountSummary {
+  balance: number;
+  equity: number;
+  profit: number;
+  deposits: number;
+  withdrawals: number;
+  commission: number;
+  interest: number;
+  pips: number;
+  drawdown: number;
+  gain: number;
+  absGain: number;
+  daily: number;
+  monthly: number;
+  profitFactor: number;
+  trades: number;
+  winRatePct: number;
+  currency: string;
+  server: string;
+  creationDate: string;
+  firstTradeDate: string;
+  lastUpdateDate: string;
 }
 
 export type LiveMonthlyByYear = Record<string, Record<string, number>>;
@@ -26,8 +73,10 @@ export type LiveMonthlyByYear = Record<string, Record<string, number>>;
 export interface LiveAccountFeed {
   productId: 'v10' | 'gold';
   open: LiveTrade[];
+  orders: LiveOrder[];
   history: LiveTrade[];
   monthlyByYear: LiveMonthlyByYear;
+  summary?: LiveAccountSummary;
 }
 
 export interface MyfxbookAccount {
@@ -77,8 +126,10 @@ export interface SyncEnvelope {
 
 export interface MyfxbookSyncAccount extends Partial<MyfxbookAccount> {
   openTrades?: LiveTrade[];
+  openOrders?: LiveOrder[];
   history?: LiveTrade[];
   monthlyByYear?: LiveMonthlyByYear;
+  summary?: LiveAccountSummary;
 }
 
 export interface MyfxbookSyncResponse {
