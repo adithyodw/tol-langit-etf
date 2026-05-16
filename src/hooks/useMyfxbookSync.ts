@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { syncFromMyfxbook, SyncResult } from '../services/myfxbook';
 import { V10, GOLD } from '../data/signals';
+import type { LiveAccountFeed } from '../data/types';
 
 const DAILY_MS = 24 * 60 * 60 * 1000;
 
@@ -11,6 +12,7 @@ export interface SyncState {
   source: 'myfxbook-api' | 'fallback';
   notice?: string;
   loading: boolean;
+  feeds: { v10?: LiveAccountFeed; gold?: LiveAccountFeed };
 }
 
 export function useMyfxbookSync(): SyncState & { syncNow: () => Promise<void> } {
@@ -21,6 +23,7 @@ export function useMyfxbookSync(): SyncState & { syncNow: () => Promise<void> } 
     source: 'fallback',
     notice: 'Initializing — showing last verified Myfxbook values.',
     loading: true,
+    feeds: {},
   });
   const inflight = useRef(false);
 
@@ -37,6 +40,7 @@ export function useMyfxbookSync(): SyncState & { syncNow: () => Promise<void> } 
         source: result.envelope.source,
         notice: result.envelope.notice,
         loading: false,
+        feeds: result.envelope.feeds,
       });
     } finally {
       inflight.current = false;

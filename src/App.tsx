@@ -45,7 +45,8 @@ export default function App() {
   const renderScreen = () => {
     if (detail) {
       const s = detail === 'v10' ? sync.v10 : sync.gold;
-      return <SignalDetail signal={s} onBack={() => setDetail(null)} />;
+      const feed = detail === 'v10' ? sync.feeds.v10 : sync.feeds.gold;
+      return <SignalDetail signal={s} liveFeed={feed} onBack={() => setDetail(null)} />;
     }
     switch (tab) {
       case 'home':
@@ -59,6 +60,8 @@ export default function App() {
             loading={sync.loading}
             onSyncNow={sync.syncNow}
             onOpenSignal={openSignal}
+            v10Feed={sync.feeds.v10}
+            goldFeed={sync.feeds.gold}
           />
         );
       case 'signals':
@@ -66,7 +69,13 @@ export default function App() {
       case 'systems':
         return <Systems v10={sync.v10} gold={sync.gold} />;
       case 'activity':
-        return <Activity />;
+        return (
+          <Activity
+            v10Feed={sync.feeds.v10}
+            goldFeed={sync.feeds.gold}
+            source={sync.source}
+          />
+        );
       case 'profile':
         return <Profile />;
     }

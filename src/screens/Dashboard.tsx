@@ -3,6 +3,9 @@ import { SignalStats } from '../data/signals';
 import { MonthlyAnalytics } from '../components/MonthlyAnalytics';
 import { SimulationPanel } from '../components/SimulationPanel';
 import { V10_MONTHLY, GOLD_MONTHLY } from '../data/monthlyReturns';
+import type { LiveAccountFeed } from '../data/types';
+import { combineFeeds, mergeMonthly } from '../data/liveAdapters';
+import { FALLBACK_ROWS } from './activityRows';
 
 interface Props {
   v10: SignalStats;
@@ -13,11 +16,21 @@ interface Props {
   loading: boolean;
   onSyncNow: () => void;
   onOpenSignal: (id: 'v10' | 'gold') => void;
+  v10Feed?: LiveAccountFeed;
+  goldFeed?: LiveAccountFeed;
 }
 
 type Selection = 'v10' | 'gold';
 
-export function Dashboard({ v10, gold, onOpenSignal }: Props) {
+const PREVIEW_LIMIT = 4;
+
+function fmtMoney(v: number, ccy: string): string {
+  const sign = v >= 0 ? '+' : '−';
+  const abs = Math.abs(v).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return `${sign}${ccy} ${abs}`;
+}
+
+export function Dashboard({ v10, gold, onOpenSignal, v10Feed, goldFeed, source }: Props) {
   const [selected, setSelected] = useState<Selection>('v10');
 
   const blended = useMemo(() => {
@@ -35,8 +48,18 @@ export function Dashboard({ v10, gold, onOpenSignal }: Props) {
 
   const heroValue = blended.combinedEquity.toLocaleString(undefined, { maximumFractionDigits: 0 });
 
+  const v10Monthly = useMemo(() => mergeMonthly(V10_MONTHLY, v10Feed?.monthlyByYear), [v10Feed]);
+  const goldMonthly = useMemo(() => mergeMonthly(GOLD_MONTHLY, goldFeed?.monthlyByYear), [goldFeed]);
+
   const selectedProduct = selected === 'v10' ? v10 : gold;
-  const selectedMonthly = selected === 'v10' ? V10_MONTHLY : GOLD_MONTHLY;
+  const selectedMonthly = selected === 'v10' ? v10Monthly : goldMonthly;
+
+  const liveCombined = useMemo(
+    () => combineFeeds(v10Feed, goldFeed, v10.currency, gold.currency),
+    [v10Feed, goldFeed, v10.currency, gold.currency]
+  );
+  const recentRows = (liveCombined.length > 0 ? liveCombined : FALLBACK_ROWS).slice(0, PREVIEW_LIMIT);
+  const isLiveLedger = liveCombined.length > 0 && source === 'myfxbook-api';
 
   return (
     <div className="screen">
@@ -208,73 +231,36 @@ export function Dashboard({ v10, gold, onOpenSignal }: Props) {
 
       <div className="section-label">
         <span>Recent Activity</span>
-        <span className="section-right">Last 4 fills</span>
+        <span className="section-right">{isLiveLedger ? `Live · ${recentRows.length} fills` : `Last ${recentRows.length} fills`}</span>
       </div>
       <div className="ledger compact">
-        <div className="ledger-row">
-          <div className="lc-date">
-            <div className="ledger-date mono">2026-05-15</div>
-            <div className="ledger-time mono">12:15 GMT</div>
+        {recentRows.map(r => (
+          <div key={r.id} className="ledger-row">
+            <div className="lc-date">
+              <div className="ledger-date mono">{r.date}</div>
+              <div className="ledger-time mono">{r.time} GMT</div>
+            </div>
+            <div className="lc-action">
+              <span className={`side-pill side-${r.side.toLowerCase()}`}>
+                {r.status === 'open' ? 'OPEN ' : 'CLOSE '}{r.side}
+              </span>
+              <div className="ledger-sub mono">{r.product}</div>
+            </div>
+            <div className="lc-symbol">
+              <div className="ledger-strong">{r.symbol}</div>
+              <div className="ledger-sub mono">
+                {r.pips >= 0 ? '+' : ''}{r.pips.toFixed(1)} pips
+              </div>
+            </div>
+            <div className="lc-pnl mono" style={{ color: r.pnl >= 0 ? 'var(--pos)' : 'var(--neg)' }}>
+              {fmtMoney(r.pnl, r.currency)}
+            </div>
           </div>
-          <div className="lc-action">
-            <span className="side-pill side-buy">CLOSE BUY</span>
-            <div className="ledger-sub mono">GOLD</div>
-          </div>
-          <div className="lc-symbol">
-            <div className="ledger-strong">AUDCAD</div>
-            <div className="ledger-sub mono">+9.2 pips</div>
-          </div>
-          <div className="lc-pnl mono" style={{ color: 'var(--pos)' }}>+USD 14.06</div>
-        </div>
-        <div className="ledger-row">
-          <div className="lc-date">
-            <div className="ledger-date mono">2026-05-15</div>
-            <div className="ledger-time mono">09:25 GMT</div>
-          </div>
-          <div className="lc-action">
-            <span className="side-pill side-sell">CLOSE SELL</span>
-            <div className="ledger-sub mono">GOLD</div>
-          </div>
-          <div className="lc-symbol">
-            <div className="ledger-strong">AUDCAD</div>
-            <div className="ledger-sub mono">+3.5 pips</div>
-          </div>
-          <div className="lc-pnl mono" style={{ color: 'var(--pos)' }}>+USD 9.68</div>
-        </div>
-        <div className="ledger-row">
-          <div className="lc-date">
-            <div className="ledger-date mono">2026-05-15</div>
-            <div className="ledger-time mono">Best XAUUSD</div>
-          </div>
-          <div className="lc-action">
-            <span className="side-pill side-buy">CLOSE BUY</span>
-            <div className="ledger-sub mono">GOLD</div>
-          </div>
-          <div className="lc-symbol">
-            <div className="ledger-strong">XAUUSD</div>
-            <div className="ledger-sub mono">Best trade</div>
-          </div>
-          <div className="lc-pnl mono" style={{ color: 'var(--pos)' }}>+USD 2,061.58</div>
-        </div>
-        <div className="ledger-row">
-          <div className="lc-date">
-            <div className="ledger-date mono">2026-05-16</div>
-            <div className="ledger-time mono">Today</div>
-          </div>
-          <div className="lc-action">
-            <span className="side-pill side-buy">V10 DAY</span>
-            <div className="ledger-sub mono">V10</div>
-          </div>
-          <div className="lc-symbol">
-            <div className="ledger-strong">Today P/L</div>
-            <div className="ledger-sub mono">3 fills · 33% win</div>
-          </div>
-          <div className="lc-pnl mono" style={{ color: 'var(--pos)' }}>+SGD 107.65</div>
-        </div>
+        ))}
       </div>
 
       <div className="footnote">
-        All figures read live from Myfxbook — V10 #{v10.myfxbookAccountId} · SGD and ETF Gold #{gold.myfxbookAccountId} · USD. Composite is equal-weighted; SGD/USD legs are not FX-normalised. Replicate via MQL5, SignalStart, or ZuluTrade. Past performance is not indicative of future results.
+        All figures read live from Myfxbook — V10 #{v10.myfxbookAccountId} · SGD and ETF Gold #{gold.myfxbookAccountId} · USD — re-pulled server-side on load and refreshed by daily Vercel cron. Composite is equal-weighted; SGD/USD legs are not FX-normalised. Replicate via MQL5, SignalStart, or ZuluTrade. Past performance is not indicative of future results.
       </div>
     </div>
   );

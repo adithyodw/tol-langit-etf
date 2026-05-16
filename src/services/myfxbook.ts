@@ -6,7 +6,15 @@
 // or auth missing) we surface the static fallback shipped in src/data/signals.ts.
 
 import { buildFallbackAccounts, V10, GOLD, hydrateSignal, SignalStats } from '../data/signals';
-import type { MyfxbookAccount, MyfxbookSyncResponse, SyncEnvelope } from '../data/types';
+import type {
+  LiveAccountFeed,
+  LiveMonthlyByYear,
+  LiveTrade,
+  MyfxbookAccount,
+  MyfxbookSyncAccount,
+  MyfxbookSyncResponse,
+  SyncEnvelope,
+} from '../data/types';
 
 const SYNC_ENDPOINT = '/api/myfxbook/sync';
 const SYNC_TIMEOUT_MS = 8_000;
@@ -16,13 +24,12 @@ export interface SyncResult {
   signals: { v10: SignalStats; gold: SignalStats };
 }
 
-type ApiAccount = NonNullable<NonNullable<MyfxbookSyncResponse['accounts']>['v10']>;
-
 function fallbackEnvelope(notice: string): SyncEnvelope {
   return {
     source: 'fallback',
     syncedAt: new Date().toISOString(),
     accounts: buildFallbackAccounts(),
+    feeds: {},
     notice,
   };
 }
@@ -39,7 +46,7 @@ function envelopeToSignals(env: SyncEnvelope): SyncResult['signals'] {
 
 function normalizeAccount(
   base: MyfxbookAccount,
-  account: ApiAccount
+  account: MyfxbookSyncAccount
 ): MyfxbookAccount {
   return {
     ...base,
@@ -48,6 +55,30 @@ function normalizeAccount(
     accountId: String(account?.accountId ?? account?.id ?? base.accountId),
     name: account?.name ?? base.name,
   };
+}
+
+function tagTrades(
+  trades: LiveTrade[] | undefined,
+  productId: 'v10' | 'gold',
+  currency: string
+): LiveTrade[] {
+  if (!Array.isArray(trades)) return [];
+  return trades.map((t) => ({ ...t, productId, currency }));
+}
+
+function buildFeed(
+  account: MyfxbookSyncAccount | undefined,
+  productId: 'v10' | 'gold',
+  currency: string
+): LiveAccountFeed | undefined {
+  if (!account) return undefined;
+  const open = tagTrades(account.openTrades, productId, currency);
+  const history = tagTrades(account.history, productId, currency);
+  const monthlyByYear: LiveMonthlyByYear = account.monthlyByYear ?? {};
+  if (!open.length && !history.length && Object.keys(monthlyByYear).length === 0) {
+    return undefined;
+  }
+  return { productId, open, history, monthlyByYear };
 }
 
 function responseToEnvelope(payload: MyfxbookSyncResponse): SyncEnvelope {
@@ -64,6 +95,10 @@ function responseToEnvelope(payload: MyfxbookSyncResponse): SyncEnvelope {
       normalizeAccount(v10Base, payload.accounts.v10),
       normalizeAccount(goldBase, payload.accounts.gold),
     ],
+    feeds: {
+      v10: buildFeed(payload.accounts.v10, 'v10', V10.currency),
+      gold: buildFeed(payload.accounts.gold, 'gold', GOLD.currency),
+    },
   };
 }
 

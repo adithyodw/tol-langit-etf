@@ -2,6 +2,34 @@
 
 export type SyncSource = 'myfxbook-api' | 'fallback';
 
+export type TradeSide = 'BUY' | 'SELL' | 'BAL';
+export type TradeStatus = 'open' | 'closed';
+
+export interface LiveTrade {
+  ticket: string;
+  symbol: string;
+  side: TradeSide;
+  status: TradeStatus;
+  openTime: string;            // ISO timestamp
+  closeTime: string | null;    // ISO timestamp (null when status === 'open')
+  openPrice: number;
+  closePrice: number | null;
+  lots: number;
+  pips: number;
+  profit: number;
+  productId?: 'v10' | 'gold';  // attached client-side
+  currency?: string;           // attached client-side
+}
+
+export type LiveMonthlyByYear = Record<string, Record<string, number>>;
+
+export interface LiveAccountFeed {
+  productId: 'v10' | 'gold';
+  open: LiveTrade[];
+  history: LiveTrade[];
+  monthlyByYear: LiveMonthlyByYear;
+}
+
 export interface MyfxbookAccount {
   id: number;
   name: string;
@@ -43,7 +71,14 @@ export interface SyncEnvelope {
   source: SyncSource;
   syncedAt: string;        // ISO timestamp
   accounts: MyfxbookAccount[];
+  feeds: { v10?: LiveAccountFeed; gold?: LiveAccountFeed };
   notice?: string;         // human-readable reason if fallback was used
+}
+
+export interface MyfxbookSyncAccount extends Partial<MyfxbookAccount> {
+  openTrades?: LiveTrade[];
+  history?: LiveTrade[];
+  monthlyByYear?: LiveMonthlyByYear;
 }
 
 export interface MyfxbookSyncResponse {
@@ -52,7 +87,7 @@ export interface MyfxbookSyncResponse {
   message?: string;
   useFallback?: boolean;
   accounts?: {
-    v10?: Partial<MyfxbookAccount> & { openTrades?: unknown[] };
-    gold?: Partial<MyfxbookAccount> & { openTrades?: unknown[] };
+    v10?: MyfxbookSyncAccount;
+    gold?: MyfxbookSyncAccount;
   };
 }

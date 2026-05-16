@@ -1,11 +1,15 @@
+import { useMemo } from 'react';
 import { SignalStats } from '../data/signals';
 import { MonthlyAnalytics } from '../components/MonthlyAnalytics';
 import { SimulationPanel } from '../components/SimulationPanel';
 import { V10_MONTHLY, GOLD_MONTHLY } from '../data/monthlyReturns';
+import type { LiveAccountFeed } from '../data/types';
+import { mergeMonthly } from '../data/liveAdapters';
 
 interface Props {
   signal: SignalStats;
   onBack: () => void;
+  liveFeed?: LiveAccountFeed;
 }
 
 function venueMarkClass(label: string): string {
@@ -43,9 +47,13 @@ const DOC_ICON = (
   </svg>
 );
 
-export function SignalDetail({ signal: s, onBack }: Props) {
+export function SignalDetail({ signal: s, onBack, liveFeed }: Props) {
   const color = s.id === 'gold' ? '#b89a4e' : '#0a1f3d';
-  const monthly = s.id === 'gold' ? GOLD_MONTHLY : V10_MONTHLY;
+  const baseMonthly = s.id === 'gold' ? GOLD_MONTHLY : V10_MONTHLY;
+  const monthly = useMemo(
+    () => mergeMonthly(baseMonthly, liveFeed?.monthlyByYear),
+    [baseMonthly, liveFeed]
+  );
 
   return (
     <div className="screen">
