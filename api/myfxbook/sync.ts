@@ -72,11 +72,10 @@ export type MonthlyByYear = Record<string, Record<string, number>>;
 interface NormalisedAccountPayload {
   id: number;
   name: string;
-  accountId?: string;
-  [key: string]: unknown;
   openTrades: NormalisedTrade[];
   history: NormalisedTrade[];
   monthlyByYear: MonthlyByYear;
+  [key: string]: unknown;
 }
 
 function getAccount(accountsData: MyfxbookAccountsResponse, accountId: number): MyfxbookAccount {
