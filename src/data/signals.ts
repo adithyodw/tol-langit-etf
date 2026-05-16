@@ -15,6 +15,11 @@ export interface CopyVenue {
   hint: string;
 }
 
+export interface FactsheetProfile {
+  category: string;             // Short ETF-style allocation tag, e.g. "Core Capital Preservation"
+  bullets: string[];            // Use-case + allocation guidance, presented as paragraphs
+}
+
 export interface SignalStats {
   id: 'v10' | 'gold';
   name: string;
@@ -44,6 +49,7 @@ export interface SignalStats {
   trackRecordYears: number;     // Length of the verified live track record
   lastUpdate: string;
   copyVenues: CopyVenue[];      // Public copy-trade rails for this product
+  factsheet: FactsheetProfile;  // ETF-style allocation profile for the Profile + Detail screens
 }
 
 // TOL LANGIT V10 — Real (SGD), IC Markets, MT4, 1:500
@@ -101,6 +107,14 @@ export const V10: SignalStats = {
       href: 'https://www.zulutrade.com/trader/417743/trading',
     },
   ],
+  factsheet: {
+    category: 'Core Capital Preservation',
+    bullets: [
+      'Suitable as a core systematic allocation prioritising capital preservation with steady compounding. Structurally analogous to a conservative fixed-income systematic strategy within a diversified portfolio.',
+      'Five-year live track since July 2021 across roughly 5,000 verified fills — the engine has experienced multiple regime breaks rather than a single benign sample.',
+      'Position sizing should respect the verified historical drawdown of ~70% on equity. The strategy is designed to be replicated with capital you have explicitly earmarked for systematic FX, not your operating cash.',
+    ],
+  },
 };
 
 // TOL LANGIT ETF GOLD — Real (USD), IC Markets, MT5, 1:500 — XAUUSD + AUDCAD
@@ -147,6 +161,14 @@ export const GOLD: SignalStats = {
       href: 'https://icmarkets.signalstart.com/analysis/tol-langit-etf-gold/288423',
     },
   ],
+  factsheet: {
+    category: 'Gold Specialist Growth Satellite',
+    bullets: [
+      'XAU/USD focused growth strategy delivering +350.25% in its first three months with no grid mechanics. Profit factor of 2.55 across 430 verified trades confirms a structurally sound institutional-grade risk profile.',
+      'Monthly gain of +236.80% demonstrates exceptional return generation potential with near-intraday scalping efficiency. Balance drawdown of 40.32% reflects the intensity of rapid gold-specialist execution; equity drawdown of 39.64% is aligned with intra-period XAU/USD volatility.',
+      'The three-month maturation milestone has been exceeded with compelling returns — formal strategic allocation appropriate with disciplined position sizing and elevated leverage awareness.',
+    ],
+  },
 };
 
 export const ALL_SIGNALS: SignalStats[] = [V10, GOLD];
@@ -239,11 +261,12 @@ export const OPERATOR = {
   initials: 'AD',
   handle: '@tol_langit',
   role: 'Principal · Systematic execution & risk',
-  bio:
-    'Independent systematic operator running two live, Myfxbook-verified trading accounts at IC Markets. ' +
-    'V10 (SGD · MT4) — a multi-pair FX basket with a five-year live track record since July 2021. ' +
-    'ETF Gold (USD · MT5) — XAUUSD with an AUDCAD overlay. ' +
+  bio: [
+    'Independent systematic operator running two live, Myfxbook-verified trading accounts at IC Markets.',
+    'V10 (SGD · MT4) — a multi-pair FX basket with a five-year live track record since July 2021.',
+    'ETF Gold (USD · MT5) — XAUUSD with an AUDCAD overlay.',
     'No pooled capital, no managed accounts, no marketing track. Every fill is mirrored to a public statement, so investors audit the same numbers their copy-trade subscription will execute against.',
+  ],
   links: {
     github: 'https://github.com/adithyodw',
     linkedin: 'https://www.linkedin.com/in/adithyodw',

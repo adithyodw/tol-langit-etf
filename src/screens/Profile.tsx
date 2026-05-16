@@ -75,7 +75,9 @@ export function Profile() {
       </div>
 
       <div className="thesis op-bio">
-        <p>{OPERATOR.bio}</p>
+        {OPERATOR.bio.map((line, i) => (
+          <p key={i}>{line}</p>
+        ))}
       </div>
 
       <div className="positioning">
@@ -118,6 +120,69 @@ export function Profile() {
         </div>
       </div>
 
+      <div className="section-label">
+        <span>Strategy Factsheets</span>
+        <span className="section-right">ETF-style profiles</span>
+      </div>
+      <div className="footnote sm-pad" style={{ paddingTop: 0 }}>
+        How each product fits inside an institutional or qualified-retail portfolio. Every figure is sourced from the live Myfxbook account header — no marketing numbers.
+      </div>
+      <div className="factsheet-stack">
+        {PRODUCT_GROUPS.map((g) => (
+          <div key={g.signal.id} className="factsheet">
+            <div className="factsheet-head">
+              <span className="factsheet-dot" style={{ background: g.accent }} />
+              <div className="factsheet-titleblock">
+                <div className="factsheet-product">{g.signal.name}</div>
+                <div className="factsheet-meta mono">
+                  {g.signal.platform.toUpperCase()} · {g.signal.currency} · #{g.signal.myfxbookAccountId}
+                </div>
+              </div>
+            </div>
+            <div className="factsheet-cat">
+              <span className="factsheet-cat-k">Allocation Category</span>
+              <span className="factsheet-cat-v">{g.signal.factsheet.category}</span>
+            </div>
+            <div className="factsheet-bullets">
+              {g.signal.factsheet.bullets.map((b, i) => (
+                <p key={i}>{b}</p>
+              ))}
+            </div>
+            <div className="factsheet-risk">
+              <div className="factsheet-risk-h mono">RISK · MYFXBOOK VERIFIED</div>
+              <div className="factsheet-risk-grid">
+                <div className="factsheet-risk-cell">
+                  <span className="factsheet-risk-k">Verified max DD</span>
+                  <span className="factsheet-risk-v mono" style={{ color: 'var(--neg)' }}>
+                    −{g.signal.drawdownPct.toFixed(2)}%
+                  </span>
+                </div>
+                <div className="factsheet-risk-cell">
+                  <span className="factsheet-risk-k">Profit factor</span>
+                  <span className="factsheet-risk-v mono">{g.signal.profitFactor.toFixed(2)}</span>
+                </div>
+                <div className="factsheet-risk-cell">
+                  <span className="factsheet-risk-k">Win rate</span>
+                  <span className="factsheet-risk-v mono">{g.signal.winRatePct}%</span>
+                </div>
+                <div className="factsheet-risk-cell">
+                  <span className="factsheet-risk-k">Trades</span>
+                  <span className="factsheet-risk-v mono">{g.signal.trades.toLocaleString()}</span>
+                </div>
+                <div className="factsheet-risk-cell">
+                  <span className="factsheet-risk-k">Live since</span>
+                  <span className="factsheet-risk-v mono">{g.signal.startedOn}</span>
+                </div>
+                <div className="factsheet-risk-cell">
+                  <span className="factsheet-risk-k">Track record</span>
+                  <span className="factsheet-risk-v mono">{g.signal.trackRecordYears}y</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
       <div className="section-label"><span>Broker</span></div>
       <a className="broker-card" href={OPERATOR.links.icMarkets} target="_blank" rel="noreferrer">
         <div className="broker-mark"><span className="broker-mark-text">IC</span></div>
@@ -131,6 +196,21 @@ export function Profile() {
         </div>
         <span className="verif-chev">↗</span>
       </a>
+      <div className="card broker-explainer">
+        <div className="broker-explainer-h">Why IC Markets?</div>
+        <p>
+          IC Markets is regulated by the Australian Securities and Investments Commission (ASIC) under
+          AFS Licence No. 335692 — one of the world's most rigorous financial regulatory frameworks.
+          ASIC licensees must maintain segregated client funds, adhere to strict capital adequacy
+          requirements, and submit to ongoing regulatory audits.
+        </p>
+        <p>
+          As a True ECN broker, IC Markets provides institutional-grade execution with spreads from
+          0.0 pips on major currency pairs, direct access to Tier 1 bank liquidity, and no dealing-desk
+          intervention — the standard execution environment for professional algorithmic EA trading
+          strategies.
+        </p>
+      </div>
       <div className="footnote sm-pad">
         Disclosure — the IC Markets link is an affiliate code. It does not change your spreads, your commissions, or how the strategy executes on your account.
       </div>
@@ -157,6 +237,7 @@ export function Profile() {
         <p><span className="mono">02</span><span>Past performance — including all Myfxbook, MQL5, SignalStart, and ZuluTrade figures shown — is not indicative of future results. The Simulation tool is a historical replay, not a forecast.</span></p>
         <p><span className="mono">03</span><span>V10 has historically experienced drawdowns above 70% of equity. Size positions accordingly and never replicate beyond your personal loss tolerance.</span></p>
         <p><span className="mono">04</span><span>Copy execution remains the subscriber's responsibility. The operator does not custody client funds and is not authorised to accept discretionary mandates.</span></p>
+        <p><span className="mono">05</span><span>Never risk money you cannot afford to lose — trading CFDs involves significant risks, and replication should be funded only with capital explicitly earmarked for systematic strategies.</span></p>
       </div>
 
       <div className="footnote">© 2026 TOL LANGIT · For institutional and qualified retail reference only.</div>
