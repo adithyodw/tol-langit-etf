@@ -3,10 +3,17 @@
 //   V10:  https://www.myfxbook.com/members/adithyodw/tol-langit-v10/8671765
 //   Gold: https://www.myfxbook.com/members/adithyodw/tol-langit-etf-gold/12042787
 //
-// Only Myfxbook is treated as the source of truth. MQL5 is a reference link only.
-// Every number below was copied directly from the Myfxbook account header.
+// Only Myfxbook is treated as the source of truth. MQL5, SignalStart, and
+// ZuluTrade are reference / copy-trade venues — execution and PnL are mirrored
+// off the same broker account.
 
 import type { MyfxbookAccount } from './types';
+
+export interface CopyVenue {
+  label: string;
+  href: string;
+  hint: string;
+}
 
 export interface SignalStats {
   id: 'v10' | 'gold';
@@ -33,8 +40,10 @@ export interface SignalStats {
   mql5Url: string;
   myfxbookUrl: string;
   myfxbookStatementUrl: string;
-  startedOn: string;
+  startedOn: string;            // ISO date — first verified track-record month
+  trackRecordYears: number;     // Length of the verified live track record
   lastUpdate: string;
+  copyVenues: CopyVenue[];      // Public copy-trade rails for this product
 }
 
 // TOL LANGIT V10 — Real (SGD), IC Markets, MT4, 1:500
@@ -72,8 +81,26 @@ export const V10: SignalStats = {
   mql5Url: 'https://www.mql5.com/en/signals/1083101',
   myfxbookUrl: 'https://www.myfxbook.com/members/adithyodw/tol-langit-v10/8671765',
   myfxbookStatementUrl: 'https://www.myfxbook.com/secure/statements/8671765/statement.html',
-  startedOn: '2023-04-18',
+  startedOn: '2021-07-01',
+  trackRecordYears: 5,
   lastUpdate: '2026-05-16',
+  copyVenues: [
+    {
+      label: 'MQL5',
+      hint: 'Signal subscription · MetaTrader',
+      href: 'https://www.mql5.com/en/signals/1083101',
+    },
+    {
+      label: 'SignalStart',
+      hint: 'Auto-copy · IC Markets',
+      href: 'https://icmarkets.signalstart.com/analysis/tol-langit-v10/232541',
+    },
+    {
+      label: 'ZuluTrade',
+      hint: 'Social · auto-copy',
+      href: 'https://www.zulutrade.com/trader/417743/trading',
+    },
+  ],
 };
 
 // TOL LANGIT ETF GOLD — Real (USD), IC Markets, MT5, 1:500 — XAUUSD + AUDCAD
@@ -106,7 +133,20 @@ export const GOLD: SignalStats = {
   myfxbookUrl: 'https://www.myfxbook.com/members/adithyodw/tol-langit-etf-gold/12042787',
   myfxbookStatementUrl: 'https://www.myfxbook.com/secure/statements/12042787/statement.html',
   startedOn: '2025-02-09',
+  trackRecordYears: 1,
   lastUpdate: '2026-05-16',
+  copyVenues: [
+    {
+      label: 'MQL5',
+      hint: 'Signal subscription · MetaTrader',
+      href: 'https://www.mql5.com/en/signals/2360336',
+    },
+    {
+      label: 'SignalStart',
+      hint: 'Auto-copy · IC Markets',
+      href: 'https://icmarkets.signalstart.com/analysis/tol-langit-etf-gold/288423',
+    },
+  ],
 };
 
 export const ALL_SIGNALS: SignalStats[] = [V10, GOLD];
@@ -198,11 +238,11 @@ export const OPERATOR = {
   name: 'Adithyo Dewangga Wijaya',
   initials: 'AD',
   handle: '@tol_langit',
-  role: 'Systems operator · Discretionary risk',
+  role: 'Principal · Systematic execution & risk',
   bio:
-    'Independent quant trader operating two Myfxbook-verified live trading accounts at IC Markets. ' +
-    'V10 (SGD/MT4) runs a multi-pair FX basket; ETF Gold (USD/MT5) trades XAUUSD with an AUDCAD overlay. ' +
-    'No private capital pooling, no managed accounts — public track record only.',
+    'Independent systematic operator running two live, Myfxbook-verified trading accounts at IC Markets. ' +
+    'V10 (SGD · MT4) is a multi-pair FX basket with a five-year live track record since 2021; ETF Gold (USD · MT5) trades XAUUSD with an AUDCAD overlay. ' +
+    'No pooled capital, no managed accounts, no off-book PnL — every fill is mirrored to a public statement subscribers can audit before they replicate.',
   links: {
     github: 'https://github.com/adithyodw',
     linkedin: 'https://www.linkedin.com/in/adithyodw',

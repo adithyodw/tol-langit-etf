@@ -58,7 +58,7 @@ export function Signals({ v10, gold, onOpen }: Props) {
       </div>
 
       <div className="footnote sm-pad" style={{ paddingTop: 0 }}>
-        Two independent live ETF products inside the TOL LANGIT ETF wrapper. Each one is publicly verified on Myfxbook with shadow tracking on MQL5. No private capital pooling, no managed accounts.
+        Two independent live products inside the TOL LANGIT ETF wrapper. Each one is publicly verified on Myfxbook and replicable across MQL5, SignalStart, and ZuluTrade. No pooled capital, no managed accounts — investors copy the same broker fills you can audit on the live statement.
       </div>
 
       <div className="section-label">
@@ -92,21 +92,23 @@ export function Signals({ v10, gold, onOpen }: Props) {
                 </div>
                 <span className="verif-chev">↗</span>
               </a>
-              <a href={s.mql5Url} target="_blank" rel="noreferrer" className="verif-row clean">
-                <span className="verif-icon">{MQL5_ICON}</span>
-                <div className="verif-body">
-                  <div className="verif-name">MQL5</div>
-                  <div className="verif-sub">Reference · independent verification</div>
-                </div>
-                <span className="verif-chev">↗</span>
-              </a>
+              {s.copyVenues.map((v) => (
+                <a key={v.href} href={v.href} target="_blank" rel="noreferrer" className="verif-row clean">
+                  <span className="verif-icon">{MQL5_ICON}</span>
+                  <div className="verif-body">
+                    <div className="verif-name">{v.label}</div>
+                    <div className="verif-sub">{v.hint}</div>
+                  </div>
+                  <span className="verif-chev">↗</span>
+                </a>
+              ))}
             </div>
           ))}
         </div>
       </div>
 
       <div className="footnote">
-        Trading leveraged products carries significant risk of loss. Drawdowns shown are historical and may be exceeded in future market regimes.
+        Trading leveraged products carries a substantial risk of loss. Historical drawdowns shown can be exceeded in future regimes — size positions accordingly.
       </div>
     </div>
   );

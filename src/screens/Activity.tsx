@@ -164,7 +164,7 @@ export function Activity() {
       </div>
 
       <div className="footnote">
-        Mirror of the Myfxbook trade statements for accounts #8671765 (V10, SGD) and #12042787 (ETF Gold, USD). Open positions display the unrealized P/L from the public Myfxbook ledger; realized P/L is recorded only on close.
+        Live mirror of the Myfxbook trade statements for accounts #8671765 (V10, SGD) and #12042787 (ETF Gold, USD). Open positions show unrealised P/L from the public Myfxbook ledger; realised P/L is booked only on close. There is no off-book PnL — every fill an investor copies appears here.
       </div>
     </div>
   );

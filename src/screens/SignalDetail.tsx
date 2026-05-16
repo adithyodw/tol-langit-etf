@@ -1,10 +1,25 @@
 import { SignalStats } from '../data/signals';
 import { MonthlyAnalytics } from '../components/MonthlyAnalytics';
+import { SimulationPanel } from '../components/SimulationPanel';
 import { V10_MONTHLY, GOLD_MONTHLY } from '../data/monthlyReturns';
 
 interface Props {
   signal: SignalStats;
   onBack: () => void;
+}
+
+function venueMarkClass(label: string): string {
+  if (label === 'MQL5') return 'venue-mark navy';
+  if (label === 'SignalStart') return 'venue-mark gold';
+  if (label === 'ZuluTrade') return 'venue-mark';
+  return 'venue-mark muted';
+}
+
+function venueInitial(label: string): string {
+  if (label === 'MQL5') return 'M5';
+  if (label === 'SignalStart') return 'SS';
+  if (label === 'ZuluTrade') return 'ZT';
+  return label.slice(0, 2).toUpperCase();
 }
 
 const MQL5_ICON = (
@@ -51,7 +66,7 @@ export function SignalDetail({ signal: s, onBack }: Props) {
         <span className="kicker">{s.broker.toUpperCase()} · #{s.brokerAccount} · {s.platform.toUpperCase()}</span>
         <h1 className="sys-hero-name">{s.name}</h1>
         <div className="sys-hero-meta">
-          {s.role} · {s.currency} · Started {s.startedOn}
+          {s.role} · {s.currency} · Live since {s.startedOn} · {s.trackRecordYears}-year verified track record
         </div>
       </div>
 
@@ -73,6 +88,45 @@ export function SignalDetail({ signal: s, onBack }: Props) {
       </div>
       <div className="card no-pad">
         <MonthlyAnalytics data={monthly} title={`${s.name} · Monthly gain`} />
+      </div>
+
+      <div className="section-label">
+        <span>Simulation</span>
+        <span className="section-right">Historical replay</span>
+      </div>
+      <div className="footnote sm-pad" style={{ paddingTop: 0 }}>
+        Enter your starting capital and a holding period. We replay the verified Myfxbook monthly track for {s.name} over the same window — month-on-month compounding — so you can see what an investor who funded the same amount on day one would be holding today.
+      </div>
+      <div className="card no-pad">
+        <SimulationPanel signal={s} monthly={monthly} />
+      </div>
+
+      <div className="section-label">
+        <span>Replicate</span>
+        <span className="section-right">Copy-trade venues</span>
+      </div>
+      <div className="card" style={{ padding: 0 }}>
+        <div className="venues-list">
+          {s.copyVenues.map((v) => (
+            <a
+              key={v.href}
+              href={v.href}
+              target="_blank"
+              rel="noreferrer"
+              className="venue-row"
+            >
+              <span className={venueMarkClass(v.label)}>{venueInitial(v.label)}</span>
+              <div className="venue-body">
+                <div className="venue-name">{v.label}</div>
+                <div className="venue-sub">{v.hint}</div>
+              </div>
+              <span className="venue-cta">Open ↗</span>
+            </a>
+          ))}
+        </div>
+      </div>
+      <div className="footnote sm-pad" style={{ paddingTop: 8 }}>
+        All venues mirror the same broker fills on account #{s.brokerAccount} at {s.broker}. Subscriber spreads, copier latency, and venue fees are not part of the Myfxbook performance.
       </div>
 
       <div className="section-label"><span>Performance</span></div>
@@ -130,7 +184,7 @@ export function SignalDetail({ signal: s, onBack }: Props) {
       </div>
 
       <div className="footnote">
-        Broker account #{s.brokerAccount} at {s.broker} ({s.platform}, {s.currency}). Tracked publicly on Myfxbook as account #{s.myfxbookAccountId}. Past performance is not a guarantee of future results.
+        Live broker account #{s.brokerAccount} at {s.broker} ({s.platform}, {s.currency}), publicly mirrored on Myfxbook as account #{s.myfxbookAccountId}. Every fill is tracked off the same statement — there is no separate book. Past performance is not indicative of future results.
       </div>
     </div>
   );

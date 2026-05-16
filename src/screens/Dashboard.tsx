@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { SignalStats } from '../data/signals';
 import { MonthlyAnalytics } from '../components/MonthlyAnalytics';
+import { SimulationPanel } from '../components/SimulationPanel';
 import { V10_MONTHLY, GOLD_MONTHLY } from '../data/monthlyReturns';
 
 interface Props {
@@ -62,7 +63,7 @@ export function Dashboard({ v10, gold, onOpenSignal }: Props) {
           <span className="mono" style={{ color: 'var(--pos)' }}>
             +{blended.compositeGrowthPct.toFixed(2)}%
           </span>
-          <span className="hero-period">composite Myfxbook gain · since {v10.startedOn}</span>
+          <span className="hero-period">composite Myfxbook gain · live since {v10.startedOn}</span>
         </div>
       </div>
 
@@ -126,6 +127,17 @@ export function Dashboard({ v10, gold, onOpenSignal }: Props) {
           data={selectedMonthly}
           title={`${selectedProduct.name} · Monthly gain`}
         />
+      </div>
+
+      <div className="section-label">
+        <span>Simulation</span>
+        <span className="section-right">{selected === 'v10' ? 'V10' : 'ETF Gold'} · historical replay</span>
+      </div>
+      <div className="footnote sm-pad" style={{ paddingTop: 0 }}>
+        Position size your capital, pick a holding period, and replay the verified Myfxbook track for {selectedProduct.name}. The output is what an investor who had funded the same amount would be holding today, before copy-trade fees.
+      </div>
+      <div className="card no-pad">
+        <SimulationPanel signal={selectedProduct} monthly={selectedMonthly} />
       </div>
 
       <div className="section-label">
@@ -243,7 +255,7 @@ export function Dashboard({ v10, gold, onOpenSignal }: Props) {
       </div>
 
       <div className="footnote">
-        All performance metrics are pulled live from Myfxbook (V10 #{v10.myfxbookAccountId}, ETF Gold #{gold.myfxbookAccountId}). Composite figures are equal-weighted; underlying currencies (SGD/USD) are not FX-normalized. Past performance is not indicative of future results.
+        All performance metrics are pulled live from Myfxbook (V10 #{v10.myfxbookAccountId} · SGD, ETF Gold #{gold.myfxbookAccountId} · USD). Composite figures are equal-weighted; the underlying currencies are not FX-normalised. Replication is available through MQL5, SignalStart, and ZuluTrade — see each product page for venue links. Past performance is not indicative of future results.
       </div>
     </div>
   );

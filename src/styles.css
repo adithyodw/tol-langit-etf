@@ -982,3 +982,250 @@ body { font-family: 'Geist', system-ui, sans-serif; font-feature-settings: 'ss01
   .topbar { padding-top: 10px; padding-bottom: 6px; }
 }
 
+/* ─────────── simulation panel ─────────── */
+.sim-panel {
+  display: flex;
+  flex-direction: column;
+}
+.sim-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border-bottom: 1px solid var(--hairline);
+  background: var(--bg-2);
+}
+.sim-field {
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+.sim-field + .sim-field {
+  border-left: 1px solid var(--hairline);
+}
+.sim-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.18em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+.sim-input-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--hairline-2);
+  padding: 8px 10px;
+  gap: 8px;
+  min-width: 0;
+}
+.sim-input-row:focus-within {
+  border-color: var(--ink);
+}
+.sim-input-prefix {
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+}
+.sim-input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 16px;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+  min-width: 0;
+}
+.sim-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.sim-preset {
+  background: var(--surface);
+  border: 1px solid var(--hairline-2);
+  padding: 4px 9px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  cursor: pointer;
+  text-transform: uppercase;
+}
+.sim-preset.on {
+  background: var(--ink);
+  color: var(--bg);
+  border-color: var(--ink);
+}
+.sim-seg {
+  display: inline-flex;
+  border: 1px solid var(--hairline-2);
+  background: var(--surface);
+  width: fit-content;
+  max-width: 100%;
+}
+.sim-seg-btn {
+  background: transparent;
+  border: none;
+  padding: 6px 14px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  color: var(--muted);
+  text-transform: uppercase;
+  cursor: pointer;
+  border-right: 1px solid var(--hairline-2);
+}
+.sim-seg-btn:last-child {
+  border-right: none;
+}
+.sim-seg-btn.on {
+  background: var(--ink);
+  color: var(--bg);
+}
+.sim-period {
+  font-size: 10.5px;
+  color: var(--muted-2);
+  letter-spacing: 0.06em;
+}
+.sim-headline {
+  padding: 16px 16px 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border-bottom: 1px solid var(--hairline);
+}
+.sim-headline-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+.sim-headline-k {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.18em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+.sim-headline-v {
+  font-size: 22px;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  font-weight: 500;
+  text-align: right;
+}
+.sim-headline-row:first-child .sim-headline-v {
+  font-family: 'Instrument Serif', serif;
+  font-size: 28px;
+  letter-spacing: -0.005em;
+}
+.sim-headline-row:nth-child(2) .sim-headline-v {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+}
+.sim-chart {
+  padding: 8px 4px 0;
+}
+.sim-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--hairline);
+  border-top: 1px solid var(--hairline);
+}
+.sim-stat {
+  background: var(--bg);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.sim-stat-k {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+.sim-stat-v {
+  font-size: 13px;
+  color: var(--ink);
+  line-height: 1.15;
+}
+.sim-disclaimer {
+  padding: 12px 16px 14px;
+  font-size: 10.5px;
+  line-height: 1.55;
+  color: var(--muted);
+  border-top: 1px solid var(--hairline);
+  background: var(--bg-2);
+}
+
+/* ─────────── copy venues (per-product replication rails) ─────────── */
+.venues-list {
+  display: flex;
+  flex-direction: column;
+}
+.venue-row {
+  display: grid;
+  grid-template-columns: 36px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  text-decoration: none;
+  color: inherit;
+  border-bottom: 1px solid var(--hairline);
+}
+.venue-row:last-child {
+  border-bottom: none;
+}
+.venue-row:active {
+  background: var(--bg-2);
+}
+.venue-mark {
+  width: 36px;
+  height: 36px;
+  background: var(--ink);
+  color: #f6f4ee;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+.venue-mark.gold { background: var(--gold); color: #1a1a18; }
+.venue-mark.navy { background: var(--navy); color: #f6f4ee; }
+.venue-mark.muted { background: var(--bg-2); color: var(--ink); border: 1px solid var(--hairline-2); }
+.venue-body { min-width: 0; }
+.venue-name { font-size: 14px; color: var(--ink); }
+.venue-sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  margin-top: 3px;
+  text-transform: uppercase;
+}
+.venue-cta {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.18em;
+  color: var(--ink);
+  text-transform: uppercase;
+}
+
+@media (max-width: 420px) {
+  .sim-controls { grid-template-columns: 1fr; }
+  .sim-field + .sim-field { border-left: none; border-top: 1px solid var(--hairline); }
+  .sim-stats { grid-template-columns: repeat(2, 1fr); }
+  .sim-headline-row:first-child .sim-headline-v { font-size: 24px; }
+}
+

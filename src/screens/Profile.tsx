@@ -22,10 +22,20 @@ const GENERIC_ICON = (
 );
 
 const VERIF_LINKS = [
-  { name: 'TOL LANGIT V10', sub: 'Myfxbook · Live tracker', href: V10.myfxbookUrl, icon: MYFX_ICON },
-  { name: 'TOL LANGIT ETF GOLD', sub: 'Myfxbook · Live tracker', href: GOLD.myfxbookUrl, icon: MYFX_ICON },
-  { name: 'TOL LANGIT V10', sub: 'MQL5 · Reference', href: V10.mql5Url, icon: MQL5_ICON },
-  { name: 'TOL LANGIT ETF GOLD', sub: 'MQL5 · Reference', href: GOLD.mql5Url, icon: MQL5_ICON },
+  { name: 'TOL LANGIT V10', sub: 'Myfxbook · Primary live tracker', href: V10.myfxbookUrl, icon: MYFX_ICON },
+  { name: 'TOL LANGIT ETF GOLD', sub: 'Myfxbook · Primary live tracker', href: GOLD.myfxbookUrl, icon: MYFX_ICON },
+  ...V10.copyVenues.map((v) => ({
+    name: 'TOL LANGIT V10',
+    sub: `${v.label} · ${v.hint}`,
+    href: v.href,
+    icon: v.label === 'MQL5' ? MQL5_ICON : GENERIC_ICON,
+  })),
+  ...GOLD.copyVenues.map((v) => ({
+    name: 'TOL LANGIT ETF GOLD',
+    sub: `${v.label} · ${v.hint}`,
+    href: v.href,
+    icon: v.label === 'MQL5' ? MQL5_ICON : GENERIC_ICON,
+  })),
 ];
 
 const OP_LINKS = [
@@ -59,11 +69,14 @@ export function Profile() {
 
       <div className="positioning">
         <div className="positioning-mark">"</div>
-        <p>Two live ETF products, fully verified on Myfxbook. No pooled capital, no managed accounts — just transparent execution you can copy or audit.</p>
+        <p>Two live ETF-style products, both fully verified on Myfxbook. No pooled capital, no managed accounts, no marketing track record — only transparent broker execution that you can audit before you replicate.</p>
         <div className="positioning-cite mono">— {OPERATOR.name.toUpperCase()}</div>
       </div>
 
-      <div className="section-label"><span>Verified Track Record</span></div>
+      <div className="section-label">
+        <span>Verified Track Record</span>
+        <span className="section-right">Myfxbook + copy rails</span>
+      </div>
       <div className="card" style={{ padding: 0 }}>
         <div className="verif-list">
           {VERIF_LINKS.map(l => (
@@ -115,9 +128,9 @@ export function Profile() {
       <div className="section-label"><span>Risk Disclosure</span></div>
       <div className="card disclosure">
         <p><span className="mono">01</span><span>Trading leveraged FX and CFDs carries a substantial risk of loss and is not suitable for every investor.</span></p>
-        <p><span className="mono">02</span><span>Past performance, including the Myfxbook and MQL5 figures shown, is not indicative of future results.</span></p>
-        <p><span className="mono">03</span><span>V10 has historically experienced drawdowns of 70%+ on equity. Position size accordingly.</span></p>
-        <p><span className="mono">04</span><span>Copy execution is the subscriber's responsibility. The operator does not custody client funds.</span></p>
+        <p><span className="mono">02</span><span>Past performance — including the Myfxbook, MQL5, SignalStart, and ZuluTrade figures shown — is not indicative of future results, and the Simulation tool is a historical replay, not a forecast.</span></p>
+        <p><span className="mono">03</span><span>V10 has historically experienced drawdowns above 70% of equity. Position size accordingly and never replicate beyond your loss tolerance.</span></p>
+        <p><span className="mono">04</span><span>Copy execution is the subscriber's responsibility. The operator does not custody client funds and is not authorised to receive discretionary mandates.</span></p>
       </div>
 
       <div className="footnote">© 2026 TOL LANGIT · For institutional and qualified retail reference only.</div>
