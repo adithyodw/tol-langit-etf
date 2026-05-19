@@ -68,7 +68,7 @@ export const V10: SignalStats = {
   monthlyPct: 5.59,
   drawdownPct: 70.16,
   balance: 2055.77,
-  equity: 946.74,
+  equity: 977.65,
   profit: 5289.20,
   trades: 5053,
   winRatePct: 81,
@@ -137,7 +137,7 @@ export const GOLD: SignalStats = {
   profit: 23005.76,
   trades: 470,
   winRatePct: 78,
-  profitFactor: 2.61,
+  profitFactor: 2.34,
   pairs: ['XAUUSD', 'AUDCAD'],
   pairAllocation: [
     { pair: 'XAUUSD', weight: 87, color: '#b89a4e' },

@@ -38,9 +38,16 @@ function fallbackEnvelope(notice: string): SyncEnvelope {
 }
 
 function envelopeToSignals(env: SyncEnvelope): SyncResult['signals'] {
-  const byId = new Map(env.accounts.map(a => [a.accountId, a]));
-  const v10Acc = byId.get(V10.myfxbookAccountId);
-  const goldAcc = byId.get(GOLD.myfxbookAccountId);
+  // Myfxbook accounts carry TWO identifiers: the Myfxbook tracking `id`
+  // (e.g. 8671765) and the broker `accountId` (e.g. 270047263). signals.ts
+  // keys off the tracking id, so index by both to guarantee a match.
+  const byKey = new Map<string, MyfxbookAccount>();
+  for (const a of env.accounts) {
+    if (a.id != null) byKey.set(String(a.id), a);
+    if (a.accountId != null) byKey.set(String(a.accountId), a);
+  }
+  const v10Acc = byKey.get(V10.myfxbookAccountId);
+  const goldAcc = byKey.get(GOLD.myfxbookAccountId);
   return {
     v10: v10Acc ? hydrateSignal(V10, v10Acc) : V10,
     gold: goldAcc ? hydrateSignal(GOLD, goldAcc) : GOLD,
