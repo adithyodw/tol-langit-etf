@@ -6,6 +6,7 @@ import { Signals } from './screens/Signals';
 import { SignalDetail } from './screens/SignalDetail';
 import { Systems } from './screens/Systems';
 import { Activity } from './screens/Activity';
+import { Guide } from './screens/Guide';
 import { Profile } from './screens/Profile';
 import { useMyfxbookSync } from './hooks/useMyfxbookSync';
 
@@ -46,7 +47,14 @@ export default function App() {
     if (detail) {
       const s = detail === 'v10' ? sync.v10 : sync.gold;
       const feed = detail === 'v10' ? sync.feeds.v10 : sync.feeds.gold;
-      return <SignalDetail signal={s} liveFeed={feed} onBack={() => setDetail(null)} />;
+      return (
+        <SignalDetail
+          signal={s}
+          liveFeed={feed}
+          source={sync.source}
+          onBack={() => setDetail(null)}
+        />
+      );
     }
     switch (tab) {
       case 'home':
@@ -76,6 +84,8 @@ export default function App() {
             source={sync.source}
           />
         );
+      case 'guide':
+        return <Guide />;
       case 'profile':
         return <Profile />;
     }

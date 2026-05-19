@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { SignalStats } from '../data/signals';
 import { MonthlyAnalytics } from '../components/MonthlyAnalytics';
 import { SimulationPanel } from '../components/SimulationPanel';
+import { SyncBadge } from '../components/SyncBadge';
 import { V10_MONTHLY, GOLD_MONTHLY } from '../data/monthlyReturns';
 import type { LiveAccountFeed } from '../data/types';
 import { combineFeeds, mergeMonthly } from '../data/liveAdapters';
@@ -68,15 +69,7 @@ export function Dashboard({ v10, gold, onOpenSignal, v10Feed, goldFeed, source }
           <span className="kicker">ETF · COMPOSITE</span>
           <h1 className="topbar-title">Dashboard</h1>
         </div>
-        <span className="badge badge-pos">
-          <span
-            style={{
-              display: 'inline-block', width: 6, height: 6, borderRadius: '50%',
-              background: '#1a6e54', marginRight: 6, animation: 'pulse 1.6s infinite',
-            }}
-          />
-          LIVE
-        </span>
+        <SyncBadge source={source} />
       </div>
 
       <div className="hero">

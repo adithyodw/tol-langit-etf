@@ -5,11 +5,13 @@ import { SimulationPanel } from '../components/SimulationPanel';
 import { V10_MONTHLY, GOLD_MONTHLY } from '../data/monthlyReturns';
 import type { LiveAccountFeed } from '../data/types';
 import { mergeMonthly } from '../data/liveAdapters';
+import { SyncBadge } from '../components/SyncBadge';
 
 interface Props {
   signal: SignalStats;
   onBack: () => void;
   liveFeed?: LiveAccountFeed;
+  source: 'myfxbook-api' | 'fallback';
 }
 
 function venueMarkClass(label: string): string {
@@ -47,7 +49,7 @@ const DOC_ICON = (
   </svg>
 );
 
-export function SignalDetail({ signal: s, onBack, liveFeed }: Props) {
+export function SignalDetail({ signal: s, onBack, liveFeed, source }: Props) {
   const color = s.id === 'gold' ? '#b89a4e' : '#0a1f3d';
   const baseMonthly = s.id === 'gold' ? GOLD_MONTHLY : V10_MONTHLY;
   const monthly = useMemo(
@@ -59,15 +61,7 @@ export function SignalDetail({ signal: s, onBack, liveFeed }: Props) {
     <div className="screen">
       <div className="topbar">
         <button className="back" onClick={onBack}>← Back</button>
-        <span className="badge badge-pos">
-          <span
-            style={{
-              display: 'inline-block', width: 6, height: 6, borderRadius: '50%',
-              background: '#1a6e54', marginRight: 6,
-            }}
-          />
-          LIVE
-        </span>
+        <SyncBadge source={source} />
       </div>
 
       <div className="sys-hero">

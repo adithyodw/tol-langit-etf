@@ -1,4 +1,4 @@
-export type Tab = 'home' | 'signals' | 'systems' | 'activity' | 'profile';
+export type Tab = 'home' | 'signals' | 'systems' | 'activity' | 'guide' | 'profile';
 
 interface BottomNavProps {
   active: Tab;
@@ -27,6 +27,13 @@ const ICONS: Record<Tab, JSX.Element> = {
       <path d="M3 12h4l3-8 4 16 3-8h4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   ),
+  guide: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+      <path d="M4 5.5A2.5 2.5 0 016.5 3H20v14H6.5A2.5 2.5 0 004 19.5v-14z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+      <path d="M4 19.5A2.5 2.5 0 016.5 17H20v4H6.5A2.5 2.5 0 014 18.5" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+      <path d="M9 8h7M9 11h5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+    </svg>
+  ),
   profile: (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
       <circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth="1.6" />
@@ -40,11 +47,12 @@ const LABEL: Record<Tab, string> = {
   signals: 'Products',
   systems: 'Systems',
   activity: 'Activity',
+  guide: 'Guide',
   profile: 'Profile',
 };
 
 export function BottomNav({ active, onChange }: BottomNavProps) {
-  const tabs: Tab[] = ['home', 'signals', 'systems', 'activity', 'profile'];
+  const tabs: Tab[] = ['home', 'signals', 'systems', 'activity', 'guide', 'profile'];
   return (
     <nav className="botnav">
       {tabs.map(t => (
