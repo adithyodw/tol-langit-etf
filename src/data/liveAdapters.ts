@@ -12,6 +12,21 @@ import type { LiveAccountFeed, LiveMonthlyByYear, LiveTrade } from './types';
 import type { MonthlyByYear } from './monthlyReturns';
 import type { ActivityRow } from '../screens/activityRows';
 
+// A monthly return outside this band is treated as corrupt and discarded.
+// A month cannot lose more than 100%; a +1000% month is already far beyond
+// anything in the verified track record (Gold's best verified month is ~191%).
+const MIN_PLAUSIBLE_MONTHLY = -100;
+const MAX_PLAUSIBLE_MONTHLY = 1000;
+
+function isPlausibleMonthly(v: unknown): v is number {
+  return (
+    typeof v === 'number' &&
+    Number.isFinite(v) &&
+    v > MIN_PLAUSIBLE_MONTHLY &&
+    v <= MAX_PLAUSIBLE_MONTHLY
+  );
+}
+
 export function mergeMonthly(
   staticMap: MonthlyByYear,
   liveMap: LiveMonthlyByYear | undefined
@@ -24,7 +39,8 @@ export function mergeMonthly(
     const y = Number(yearStr);
     merged[y] = { ...(staticMap[y] ?? {}) };
   }
-  // Overlay every live cell.
+  // Overlay every live cell — but only when it passes the plausibility guard.
+  // Implausible values keep the verified static figure (or stay absent).
   for (const yearStr of Object.keys(liveMap)) {
     const y = Number(yearStr);
     if (!merged[y]) merged[y] = {};
@@ -32,8 +48,8 @@ export function mergeMonthly(
     for (const monthStr of Object.keys(months)) {
       const m = Number(monthStr);
       const v = months[monthStr];
-      if (Number.isFinite(v)) {
-        merged[y][m] = Number(v);
+      if (isPlausibleMonthly(v)) {
+        merged[y][m] = v;
       }
     }
   }

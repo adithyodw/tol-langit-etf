@@ -30,7 +30,6 @@ const v10Id = 8671765;
 const goldId = 12042787;
 
 const HISTORY_LIMIT = 80;
-const DAILY_START = '2021-01-01';
 
 interface MyfxbookLoginResponse {
   error?: boolean;
@@ -139,10 +138,6 @@ function getAccount(accountsData: MyfxbookAccountsResponse, accountId: number): 
 
 function getErrorMessage(error: unknown) {
   return error instanceof Error ? error.message : String(error);
-}
-
-function todayIso(): string {
-  return new Date().toISOString().slice(0, 10);
 }
 
 // Myfxbook timestamps come in a couple of shapes — normalise to ISO when we can.
@@ -323,67 +318,6 @@ function extractTradeArray(payload: MyfxbookGenericResponse, key: string): RawTr
   return [];
 }
 
-interface DailyGainPoint {
-  ymKey: string;
-  gainPct: number;
-}
-
-interface RawDailyEntry {
-  date?: unknown;
-  value?: unknown;
-  profit?: unknown;
-  [key: string]: unknown;
-}
-
-function flattenDailyGain(payload: MyfxbookGenericResponse): RawDailyEntry[] {
-  const series = (payload?.dailyGain ?? payload?.daily_gain ?? []) as unknown;
-  if (!Array.isArray(series)) return [];
-  const flat: RawDailyEntry[] = [];
-  for (const slot of series as Array<unknown>) {
-    if (Array.isArray(slot)) {
-      for (const inner of slot) {
-        if (inner && typeof inner === 'object') flat.push(inner as RawDailyEntry);
-      }
-    } else if (slot && typeof slot === 'object') {
-      flat.push(slot as RawDailyEntry);
-    }
-  }
-  return flat;
-}
-
-function normaliseDaily(payload: MyfxbookGenericResponse): DailyGainPoint[] {
-  const flat = flattenDailyGain(payload);
-  const result: DailyGainPoint[] = [];
-  for (const entry of flat) {
-    const dt = parseDateLoose(entry.date);
-    if (!dt) continue;
-    const y = dt.getUTCFullYear();
-    const m = dt.getUTCMonth() + 1;
-    const ymKey = `${y}-${String(m).padStart(2, '0')}`;
-    const v = num(entry.value, NaN);
-    if (!Number.isFinite(v)) continue;
-    result.push({ ymKey, gainPct: v });
-  }
-  return result;
-}
-
-function aggregateMonthly(daily: DailyGainPoint[]): MonthlyByYear {
-  const buckets = new Map<string, number[]>();
-  for (const d of daily) {
-    if (!buckets.has(d.ymKey)) buckets.set(d.ymKey, []);
-    buckets.get(d.ymKey)!.push(d.gainPct);
-  }
-  const result: MonthlyByYear = {};
-  for (const [ymKey, gains] of buckets) {
-    const [yearStr, monthStr] = ymKey.split('-');
-    const compounded = gains.reduce((acc, g) => acc * (1 + g / 100), 1);
-    const monthlyPct = Math.round((compounded - 1) * 10000) / 100;
-    if (!result[yearStr]) result[yearStr] = {};
-    result[yearStr][String(Number(monthStr))] = monthlyPct;
-  }
-  return result;
-}
-
 function sortAndLimitHistory(trades: NormalisedTrade[], limit = HISTORY_LIMIT): NormalisedTrade[] {
   return trades
     .slice()
@@ -449,28 +383,27 @@ async function fetchAccountBundle(
   history: NormalisedTrade[];
   monthlyByYear: MonthlyByYear;
 }> {
-  const today = todayIso();
-  const [gainRaw, openRaw, ordersRaw, historyRaw, dailyRaw] = await Promise.all([
+  const [gainRaw, openRaw, ordersRaw, historyRaw] = await Promise.all([
     safeJson<MyfxbookAccount>(fetch(`${BASE_URL}/get-gain.json?session=${session}&id=${accountId}`)),
     safeJson<MyfxbookGenericResponse>(fetch(`${BASE_URL}/get-open-trades.json?session=${session}&id=${accountId}`)),
     safeJson<MyfxbookGenericResponse>(fetch(`${BASE_URL}/get-open-orders.json?session=${session}&id=${accountId}`)),
     safeJson<MyfxbookGenericResponse>(fetch(`${BASE_URL}/get-history.json?session=${session}&id=${accountId}`)),
-    safeJson<MyfxbookGenericResponse>(
-      fetch(`${BASE_URL}/get-daily-gain.json?session=${session}&id=${accountId}&start=${DAILY_START}&end=${today}`)
-    ),
   ]);
 
   const open = (openRaw ? extractTradeArray(openRaw, 'openTrades') : []).map((t) => normaliseTrade(t, 'open'));
   const orders = (ordersRaw ? extractTradeArray(ordersRaw, 'openOrders') : []).map((o) => normaliseOrder(o));
   const history = (historyRaw ? extractTradeArray(historyRaw, 'history') : []).map((t) => normaliseTrade(t, 'closed'));
-  const monthlyByYear = dailyRaw ? aggregateMonthly(normaliseDaily(dailyRaw)) : {};
 
+  // Monthly returns are NOT derived from the live daily-gain feed: that endpoint
+  // cannot be reliably converted to per-month compounded returns and previously
+  // produced astronomical values. Monthly Analytics renders the hand-verified
+  // static Myfxbook history (src/data/monthlyReturns.ts) instead.
   return {
     gain: gainRaw ?? {},
     open,
     orders,
     history: sortAndLimitHistory(history),
-    monthlyByYear,
+    monthlyByYear: {},
   };
 }
 
