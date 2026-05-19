@@ -4,25 +4,29 @@
 // needs in a single round-trip per request, sanitises the payload, and caches
 // at the edge so the browser never sees the Myfxbook session token.
 //
-// Endpoints used (all under https://www.myfxbook.com/api):
-//   - login.json
-//   - get-my-accounts.json
-//   - get-gain.json
-//   - get-open-trades.json
-//   - get-open-orders.json
-//   - get-history.json
-//   - get-daily-gain.json
+// Reliability model:
+//   The CRITICAL PATH is just two calls — login.json + get-my-accounts.json.
+//   get-my-accounts alone carries every headline figure the app needs (gain,
+//   abs gain, daily, monthly, drawdown, balance, equity, profit, profit
+//   factor). Once it succeeds the sync is reported as success.
 //
-// What's returned per account (v10, gold):
-//   - summary       — account header (balance, equity, profit, deposits,
-//                     withdrawals, drawdown, profit factor, win rate, trades,
-//                     last update, leverage server) for the statement view
-//   - openTrades    — array of normalised open positions (sl, tp, swap...)
-//   - openOrders    — array of normalised pending orders
-//   - history       — most recent N closed trades (newest first, enriched)
-//   - monthlyByYear — { [year]: { [month]: returnPct } } compounded from
-//                     daily-gain so the bar chart matches Myfxbook exactly.
+//   The trade feeds (open trades, open orders, history) are BEST-EFFORT: each
+//   call has its own timeout and any failure degrades to empty arrays without
+//   failing the whole sync. Myfxbook's API is slow and occasionally stalls —
+//   a hung feed call must never drag the headline data down with it.
+//
+// Endpoints used (all under https://www.myfxbook.com/api):
+//   - login.json            (critical)
+//   - get-my-accounts.json  (critical — all headline figures)
+//   - get-open-trades.json  (best-effort)
+//   - get-open-orders.json  (best-effort)
+//   - get-history.json      (best-effort)
+//   - logout.json           (cleanup)
 import { VercelRequest, VercelResponse } from '@vercel/node';
+
+// Allow the function enough wall-clock time to complete the worst-case
+// fan-out to Myfxbook's (slow) API without Vercel terminating it early.
+export const config = { maxDuration: 60 };
 
 const BASE_URL = 'https://www.myfxbook.com/api';
 
@@ -30,6 +34,13 @@ const v10Id = 8671765;
 const goldId = 12042787;
 
 const HISTORY_LIMIT = 80;
+
+// Per-request timeouts (ms). A single hung Myfxbook call must never take the
+// whole sync down with it.
+const LOGIN_TIMEOUT_MS = 10_000;
+const ACCOUNTS_TIMEOUT_MS = 10_000;
+const FEED_TIMEOUT_MS = 8_000;
+const LOGOUT_TIMEOUT_MS = 4_000;
 
 interface MyfxbookLoginResponse {
   error?: boolean;
@@ -329,9 +340,21 @@ function sortAndLimitHistory(trades: NormalisedTrade[], limit = HISTORY_LIMIT): 
     .slice(0, limit);
 }
 
-async function safeJson<T>(promise: Promise<Response>): Promise<T | null> {
+// fetch + AbortController timeout. Guarantees a slow Myfxbook endpoint cannot
+// hang the serverless function indefinitely.
+async function fetchWithTimeout(url: string, timeoutMs: number): Promise<Response> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
-    const res = await promise;
+    return await fetch(url, { signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function safeJson<T>(url: string, timeoutMs: number): Promise<T | null> {
+  try {
+    const res = await fetchWithTimeout(url, timeoutMs);
     if (!res.ok) return null;
     return (await res.json()) as T;
   } catch {
@@ -341,27 +364,27 @@ async function safeJson<T>(promise: Promise<Response>): Promise<T | null> {
 
 function buildSummary(
   account: MyfxbookAccount,
-  gain: MyfxbookAccount,
   history: NormalisedTrade[]
 ): NormalisedSummary {
   const closedCount = history.filter((t) => t.status === 'closed').length;
   const winners = history.filter((t) => t.status === 'closed' && t.profit > 0).length;
   const winRatePct = closedCount ? Math.round((winners / closedCount) * 1000) / 10 : 0;
 
+  // All headline figures come straight from the get-my-accounts record.
   return {
-    balance: num(gain.balance ?? account.balance),
-    equity: num(gain.equity ?? account.equity),
-    profit: num(gain.profit ?? account.profit),
+    balance: num(account.balance),
+    equity: num(account.equity),
+    profit: num(account.profit),
     deposits: num(account.deposits),
     withdrawals: num(account.withdrawals),
     commission: num(account.commission),
     interest: num(account.interest),
     pips: num(account.pips),
-    drawdown: num(gain.drawdown ?? account.drawdown),
-    gain: num(gain.gain ?? account.gain),
-    absGain: num(gain.absGain ?? account.absGain),
-    daily: num(gain.daily ?? account.daily),
-    monthly: num(gain.monthly ?? account.monthly),
+    drawdown: num(account.drawdown),
+    gain: num(account.gain),
+    absGain: num(account.absGain),
+    daily: num(account.daily),
+    monthly: num(account.monthly),
     profitFactor: num(account.profitFactor),
     trades: closedCount,
     winRatePct,
@@ -373,38 +396,32 @@ function buildSummary(
   };
 }
 
-async function fetchAccountBundle(
-  session: string,
-  accountId: number
-): Promise<{
-  gain: MyfxbookAccount;
+interface AccountFeeds {
   open: NormalisedTrade[];
   orders: NormalisedOrder[];
   history: NormalisedTrade[];
-  monthlyByYear: MonthlyByYear;
-}> {
-  const [gainRaw, openRaw, ordersRaw, historyRaw] = await Promise.all([
-    safeJson<MyfxbookAccount>(fetch(`${BASE_URL}/get-gain.json?session=${session}&id=${accountId}`)),
-    safeJson<MyfxbookGenericResponse>(fetch(`${BASE_URL}/get-open-trades.json?session=${session}&id=${accountId}`)),
-    safeJson<MyfxbookGenericResponse>(fetch(`${BASE_URL}/get-open-orders.json?session=${session}&id=${accountId}`)),
-    safeJson<MyfxbookGenericResponse>(fetch(`${BASE_URL}/get-history.json?session=${session}&id=${accountId}`)),
-  ]);
+}
 
-  const open = (openRaw ? extractTradeArray(openRaw, 'openTrades') : []).map((t) => normaliseTrade(t, 'open'));
-  const orders = (ordersRaw ? extractTradeArray(ordersRaw, 'openOrders') : []).map((o) => normaliseOrder(o));
-  const history = (historyRaw ? extractTradeArray(historyRaw, 'history') : []).map((t) => normaliseTrade(t, 'closed'));
+const EMPTY_FEEDS: AccountFeeds = { open: [], orders: [], history: [] };
 
-  // Monthly returns are NOT derived from the live daily-gain feed: that endpoint
-  // cannot be reliably converted to per-month compounded returns and previously
-  // produced astronomical values. Monthly Analytics renders the hand-verified
-  // static Myfxbook history (src/data/monthlyReturns.ts) instead.
-  return {
-    gain: gainRaw ?? {},
-    open,
-    orders,
-    history: sortAndLimitHistory(history),
-    monthlyByYear: {},
-  };
+// Best-effort trade feeds. Every call is independently timed; any failure
+// degrades to empty arrays. This never throws, so it can never fail the sync.
+async function fetchAccountFeeds(session: string, accountId: number): Promise<AccountFeeds> {
+  try {
+    const [openRaw, ordersRaw, historyRaw] = await Promise.all([
+      safeJson<MyfxbookGenericResponse>(`${BASE_URL}/get-open-trades.json?session=${session}&id=${accountId}`, FEED_TIMEOUT_MS),
+      safeJson<MyfxbookGenericResponse>(`${BASE_URL}/get-open-orders.json?session=${session}&id=${accountId}`, FEED_TIMEOUT_MS),
+      safeJson<MyfxbookGenericResponse>(`${BASE_URL}/get-history.json?session=${session}&id=${accountId}`, FEED_TIMEOUT_MS),
+    ]);
+
+    const open = (openRaw ? extractTradeArray(openRaw, 'openTrades') : []).map((t) => normaliseTrade(t, 'open'));
+    const orders = (ordersRaw ? extractTradeArray(ordersRaw, 'openOrders') : []).map((o) => normaliseOrder(o));
+    const history = (historyRaw ? extractTradeArray(historyRaw, 'history') : []).map((t) => normaliseTrade(t, 'closed'));
+
+    return { open, orders, history: sortAndLimitHistory(history) };
+  } catch {
+    return EMPTY_FEEDS;
+  }
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -425,65 +442,66 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!email || !password) {
     return res.status(200).json({
       success: false,
-      message: 'No credentials in env',
+      message: 'Myfxbook credentials are not set on the server.',
       useFallback: true,
+      lastUpdated: new Date().toISOString(),
     });
   }
 
   let session: string | null = null;
 
   try {
-    const loginRes = await fetch(
-      `${BASE_URL}/login.json?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
+    // ── Critical path: login ─────────────────────────────────────────────
+    const loginData = await safeJson<MyfxbookLoginResponse>(
+      `${BASE_URL}/login.json?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`,
+      LOGIN_TIMEOUT_MS
     );
-    const loginData = (await loginRes.json()) as MyfxbookLoginResponse;
-
+    if (!loginData) throw new Error('Myfxbook login did not respond in time');
     if (loginData.error || !loginData.session) {
-      throw new Error(loginData.message || 'Login failed');
+      throw new Error(loginData.message || 'Myfxbook login was rejected');
     }
-
     session = loginData.session;
 
-    const accountsRes = await fetch(`${BASE_URL}/get-my-accounts.json?session=${session}`);
-    const accountsData = (await accountsRes.json()) as MyfxbookAccountsResponse;
-
-    if (accountsData.error) {
-      throw new Error(accountsData.message || 'Accounts fetch failed');
+    // ── Critical path: accounts (carries every headline figure) ──────────
+    const accountsData = await safeJson<MyfxbookAccountsResponse>(
+      `${BASE_URL}/get-my-accounts.json?session=${session}`,
+      ACCOUNTS_TIMEOUT_MS
+    );
+    if (!accountsData) throw new Error('Myfxbook accounts did not respond in time');
+    if (accountsData.error || !Array.isArray(accountsData.accounts)) {
+      throw new Error(accountsData.message || 'Myfxbook accounts fetch failed');
     }
-
-    const [v10Bundle, goldBundle] = await Promise.all([
-      fetchAccountBundle(session, v10Id),
-      fetchAccountBundle(session, goldId),
-    ]);
 
     const v10Account = getAccount(accountsData, v10Id);
     const goldAccount = getAccount(accountsData, goldId);
 
-    const v10Summary = buildSummary(v10Account, v10Bundle.gain, v10Bundle.history);
-    const goldSummary = buildSummary(goldAccount, goldBundle.gain, goldBundle.history);
+    // From here the sync succeeds. Trade feeds are best-effort and cannot
+    // fail the response — at worst they degrade to empty arrays.
+    const [v10Feeds, goldFeeds] = await Promise.all([
+      fetchAccountFeeds(session, v10Id),
+      fetchAccountFeeds(session, goldId),
+    ]);
 
     const v10Payload: NormalisedAccountPayload = {
       ...v10Account,
-      ...v10Bundle.gain,
       id: v10Id,
       name: 'TOL LANGIT V10',
-      summary: v10Summary,
-      openTrades: v10Bundle.open,
-      openOrders: v10Bundle.orders,
-      history: v10Bundle.history,
-      monthlyByYear: v10Bundle.monthlyByYear,
+      summary: buildSummary(v10Account, v10Feeds.history),
+      openTrades: v10Feeds.open,
+      openOrders: v10Feeds.orders,
+      history: v10Feeds.history,
+      monthlyByYear: {},
     };
 
     const goldPayload: NormalisedAccountPayload = {
       ...goldAccount,
-      ...goldBundle.gain,
       id: goldId,
       name: 'TOL LANGIT ETF GOLD',
-      summary: goldSummary,
-      openTrades: goldBundle.open,
-      openOrders: goldBundle.orders,
-      history: goldBundle.history,
-      monthlyByYear: goldBundle.monthlyByYear,
+      summary: buildSummary(goldAccount, goldFeeds.history),
+      openTrades: goldFeeds.open,
+      openOrders: goldFeeds.orders,
+      history: goldFeeds.history,
+      monthlyByYear: {},
     };
 
     res.setHeader('Cache-Control', 's-maxage=600, stale-while-revalidate=86400');
@@ -493,16 +511,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       accounts: { v10: v10Payload, gold: goldPayload },
     });
   } catch (error: unknown) {
-    console.error('Myfxbook Sync Error:', getErrorMessage(error));
+    const reason = getErrorMessage(error);
+    console.error('Myfxbook Sync Error:', reason);
     return res.status(200).json({
       success: false,
-      message: 'Data sync unavailable. Showing last verified values.',
+      message: `Live sync unavailable (${reason}) — showing last verified values.`,
       useFallback: true,
       lastUpdated: new Date().toISOString(),
     });
   } finally {
     if (session) {
-      await fetch(`${BASE_URL}/logout.json?session=${session}`).catch(() => undefined);
+      fetchWithTimeout(`${BASE_URL}/logout.json?session=${session}`, LOGOUT_TIMEOUT_MS).catch(
+        () => undefined
+      );
     }
   }
 }

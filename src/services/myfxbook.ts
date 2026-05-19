@@ -18,7 +18,9 @@ import type {
 } from '../data/types';
 
 const SYNC_ENDPOINT = '/api/myfxbook/sync';
-const SYNC_TIMEOUT_MS = 8_000;
+// Generous: a cold (uncached) call fans out to several slow Myfxbook
+// endpoints server-side. Cron-warmed edge-cache hits return near-instantly.
+const SYNC_TIMEOUT_MS = 28_000;
 
 export interface SyncResult {
   envelope: SyncEnvelope;
