@@ -85,9 +85,9 @@ export const V10_MONTHLY: MonthlyByYear = {
 export const GOLD_MONTHLY: MonthlyByYear = {
   2026: {
     2: 24.87,
-    3: -17.88,
+    3: -17.89,
     4: 190.85,
-    5: 55.84,
+    5: 71.44,
   },
 };
 

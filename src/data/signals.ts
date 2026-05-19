@@ -140,8 +140,8 @@ export const GOLD: SignalStats = {
   profitFactor: 2.61,
   pairs: ['XAUUSD', 'AUDCAD'],
   pairAllocation: [
-    { pair: 'XAUUSD', weight: 85, color: '#b89a4e' },
-    { pair: 'AUDCAD', weight: 15, color: '#0a1f3d' },
+    { pair: 'XAUUSD', weight: 87, color: '#b89a4e' },
+    { pair: 'AUDCAD', weight: 13, color: '#0a1f3d' },
   ],
   mql5Url: 'https://www.mql5.com/en/signals/2360336',
   myfxbookUrl: 'https://www.myfxbook.com/members/adithyodw/tol-langit-etf-gold/12042787',
