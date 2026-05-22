@@ -1,0 +1,361 @@
+🚀 TOL LANGIT ETF — WhatsApp Onboarding Guide
+(Copy & send messages one by one)
+
+═══════════════════════════════════════════════════════════
+
+📌 MESSAGE 1: Welcome
+───────────────────────────────────────────────────────────
+
+Hey! 👋
+
+Selamat datang ke TOL LANGIT ETF 🎯
+
+Your account is LIVE and ready to trade.
+
+Login: 8011691
+Server: ICMarketsSC-MT5-3
+Platform: MetaTrader 5
+
+Lanjut ke step berikutnya? ⬇️
+
+═══════════════════════════════════════════════════════════
+
+📌 MESSAGE 2: What is ETF?
+───────────────────────────────────────────────────────────
+
+Apa itu TOL LANGIT ETF? 🤔
+
+BUKAN managed account (uang lo dipakai orang lain)
+BUKAN copy trading (ambil risiko orang lain)
+
+✅ SEPERTI ETF:
+• Account 100% itu punya lo (IC Markets ASIC-regulated)
+• Setiap trade lo bisa lihat di MT5 langsung
+• Uang lo bisa dicabut kapan aja
+• Semua data transparent di Myfxbook (third-party verified)
+
+Jadi lo OWN account, bukan share fund. 💰
+
+═══════════════════════════════════════════════════════════
+
+📌 MESSAGE 3: Why Treat as ETF?
+───────────────────────────────────────────────────────────
+
+Kenapa "ETF"? Karena lo harus INVEST SEPERTI ETF:
+
+❌ Jangan: "Saya invest $100, expect return in 1 month"
+✅ Harus: "Saya topup $100 EVERY month, invest 12+ months"
+
+ETF = Regular contribution + Long holding = Compound growth
+
+Contoh real:
+Month 1: Topup $1,000 → Profit +$100 = $1,100
+Month 2: Topup +$500 → Account $1,600 → Lot size auto-scale
+Month 3: Topup +$500 → Account $2,100 → Keep growing...
+
+Equity scale automatically. Lot size grow dengan account. 📈
+
+═══════════════════════════════════════════════════════════
+
+📌 MESSAGE 4: Monthly Topup Plans
+───────────────────────────────────────────────────────────
+
+Pilih 1 plan (STICK TO IT):
+
+💰 STARTER: $100/month
+• Best untuk: Testing, portfolio kecil
+• 5 tahun target: $1,500–$2,000
+
+💰 BUILDER: $500/month
+• Best untuk: Serious investor
+• 5 tahun target: $7,500–$10,000
+
+💰 SERIOUS: $1,000+/month
+• Best untuk: Long-term wealth building
+• 5 tahun target: $15,000–$25,000+
+
+Mana pilihan lo? (No pressure, terserah) 👍
+
+═══════════════════════════════════════════════════════════
+
+📌 MESSAGE 5: Risk Disclosure 1
+───────────────────────────────────────────────────────────
+
+⚠️ IMPORTANT RISK INFO ⚠️
+
+Ini BUKAN passive income. BUKAN "set and forget".
+
+Ada leverage (1:500) → Position besar = Risk besar
+
+Expect:
+• 30–40% DRAWDOWN (temporary loss) = NORMAL
+• Berlangsung 2–4 bulan = ADA
+• Tapi SELALU recover = PROVEN (5 years history)
+
+Drawdown besar scary, tapi:
+✅ Sudah historical happen 100x (selalu pulih)
+✅ Avg recovery: 2–4 bulan
+✅ Jangan panic sell (lock in loss)
+✅ Keep topup during drawdown = Buy the dip
+
+Lo okay dengan ini? 🤔
+
+═══════════════════════════════════════════════════════════
+
+📌 MESSAGE 6: Risk Disclosure 2
+───────────────────────────────────────────────────────────
+
+⚠️ REAL RISKS ⚠️
+
+1️⃣ VOLATILITY TINGGI
+• Some months: -50% (scary)
+• Some months: +200% (amazing)
+• Average: +73%/month (tapi unpredictable)
+
+2️⃣ LEVERAGE RISK
+• Using 1:500 leverage
+• Auto-managed (not over-leveraged)
+• But loss can be big
+
+3️⃣ MARKET RISK
+• No EA win 100% of time
+• Have losing streaks (normal)
+• Tapi overall positive
+
+4️⃣ NEED CAPITAL AVAILABLE
+• If drawdown -40%, margin low
+• Need topup DURING drawdown (not just profit)
+• Jangan all-in, keep emergency fund
+
+Summary:
+✅ Proven system (5+ years)
+✅ Transparent (auditable)
+✅ BUT risky (leverage + volatility)
+✅ NOT for people who panic
+
+Jadi lo READY? 💪
+
+═══════════════════════════════════════════════════════════
+
+📌 MESSAGE 7: Step 1 - Download MT5
+───────────────────────────────────────────────────────────
+
+Step 1️⃣: DOWNLOAD METATRADER 5
+
+Go to: metatrader5.com (official only!)
+
+Download untuk:
+• Windows ✓
+• Mac ✓
+• Android ✓
+• iOS ✓
+
+Install itu = 10 minutes ⏱️
+
+Done? Lanjut ke step 2 👇
+
+═══════════════════════════════════════════════════════════
+
+📌 MESSAGE 8: Step 2 - Login
+───────────────────────────────────────────────────────────
+
+Step 2️⃣: LOGIN KE ACCOUNT LO
+
+Buka MT5 → File → "Login to Trading Account"
+
+Enter:
+Login: 8011691
+Server: ICMarketsSC-MT5-3
+Password: (IC Markets password lo)
+
+Klik OK.
+
+Lo should see:
+✓ Account balance (USD)
+✓ Equity (live value)
+✓ Trades tab (kosong atau ada open trades)
+
+Berhasil? 🎉 Lanjut step 3
+
+═══════════════════════════════════════════════════════════
+
+📌 MESSAGE 9: Step 3 - Verify Trades
+───────────────────────────────────────────────────────────
+
+Step 3️⃣: VERIFY TRADES RUNNING
+
+Di MT5:
+Click "Trades" tab → Should see open positions
+
+Kalo kosong = check:
+❓ Market open? (Fri 5PM – Sun 5PM UTC OFF)
+❓ Market closed = normal ✓
+❓ Still closed after 24h? = Contact me 📞
+
+Click "History" tab → Should see closed trades dari today/this week
+
+Lihat winning + losing = Normal, sistem working ✓
+
+═══════════════════════════════════════════════════════════
+
+📌 MESSAGE 10: Step 4 - Dashboard
+───────────────────────────────────────────────────────────
+
+Step 4️⃣: OPEN LIVE DASHBOARD
+
+Go to: https://tol-langit-etf.vercel.app/
+
+Click "ETF GOLD" tab
+
+Lo should see:
+✓ Your live account balance
+✓ Recent trades
+✓ Monthly returns
+✓ Equity curve
+
+Updates setiap 2–5 minutes = LIVE ✓
+
+Data match MT5? Perfect! System working 🚀
+
+═══════════════════════════════════════════════════════════
+
+📌 MESSAGE 11: Monthly Deposits
+───────────────────────────────────────────────────────────
+
+Step 5️⃣: SIAP TOPUP BULANAN?
+
+How to deposit:
+
+1. Log into IC Markets: icmarkets.com
+2. Click "Deposit"
+3. Enter amount (your plan: $100/$500/$1000)
+4. Choose payment method
+5. Wait 1–2 hours = Uang masuk MT5 ✓
+
+Terus:
+• Lot size AUTO SCALE (size grow dengan balance)
+• Jangan perlu adjust manual
+• Topup consistent = Compounding magic 💎
+
+Ready deposit bulan depan? 👍
+
+═══════════════════════════════════════════════════════════
+
+📌 MESSAGE 12: Key Metrics
+───────────────────────────────────────────────────────────
+
+📊 KEY NUMBERS (ETF GOLD)
+
+Gain: +411% (since Feb 2026)
+Win Rate: 78% (3 wins per 4 trades)
+Drawdown: 42% (worst ever, recovered)
+Monthly Avg: +73% (tapi variable)
+Profit Factor: 2.34 (earn $2.34 per $1 loss)
+Trades: 470+ live documented
+
+✅ All verifiable on:
+Myfxbook: myfxbook.com/members/adithyodw/tol-langit-etf-gold/12042787
+MT5: Your account
+Dashboard: tol-langit-etf.vercel.app
+
+100% transparent, auditable. Zero hidden 🔍
+
+═══════════════════════════════════════════════════════════
+
+📌 MESSAGE 13: DO's and DON'Ts
+───────────────────────────────────────────────────────────
+
+✅ DO:
+• Topup every month (consistency > timing)
+• Check account 1x/week (no obsess)
+• Hold minimum 12 months
+• Keep capital available for drawdowns
+• Use VPS (EA run 24/5 automated)
+
+❌ DON'T:
+• Panic sell during drawdown (lock in loss)
+• Expect 70% every month (outlier)
+• Trade manually + EA (conflict)
+• Withdraw early (destroy compounding)
+• Modify EA (locked for safety)
+
+Follow these = Success rate tinggi 📈
+
+═══════════════════════════════════════════════════════════
+
+📌 MESSAGE 14: First Week Checklist
+───────────────────────────────────────────────────────────
+
+✅ FIRST WEEK TODO:
+
+□ Download MT5
+□ Login (8011691 / ICMarketsSC-MT5-3)
+□ Verify trades running
+□ Open dashboard: tol-langit-etf.vercel.app
+□ See your account live
+□ Decide topup plan ($100/$500/$1000)
+□ Plan first deposit timing
+
+Semua done dalam 1 minggu = Ready to compound 🚀
+
+═══════════════════════════════════════════════════════════
+
+📌 MESSAGE 15: Support & Verification
+───────────────────────────────────────────────────────────
+
+❓ Pertanyaan? Stuck? Need help?
+
+📧 Email: adithyodw@gmail.com
+📱 Telegram: @tol_langit
+💬 WhatsApp: (this chat)
+
+✅ VERIFY IT'S REAL:
+• Dashboard: https://tol-langit-etf.vercel.app/
+• Myfxbook: https://www.myfxbook.com/members/adithyodw/tol-langit-etf-gold/12042787
+• IC Markets: ASIC-regulated broker (your money safe)
+• Account: 100% yours (not pooled, not shared)
+
+Semua transparent, auditable, real 🔒
+
+═══════════════════════════════════════════════════════════
+
+📌 MESSAGE 16: Final Reminder
+───────────────────────────────────────────────────────────
+
+🎯 FINAL SUMMARY:
+
+1. Account live & ready ✓
+2. Trade automatically ✓
+3. You own 100% ✓
+4. Topup monthly = Compound ✓
+5. Drawdown normal = Hold steady ✓
+6. Transparent & auditable ✓
+
+Ini bukan "get rich quick".
+Ini "steady wealth building via discipline".
+
+12+ months = Insane compound
+6 months = See progress
+3 months = Survive first drawdown
+
+Ready? 🚀
+
+═══════════════════════════════════════════════════════════
+
+📌 MESSAGE 17: Go Live
+───────────────────────────────────────────────────────────
+
+SEKARANG MULAI:
+
+1. Download MT5 (metatrader5.com)
+2. Login (8011691 / ICMarketsSC-MT5-3)
+3. Verify trades (Trades tab)
+4. Open dashboard (tol-langit-etf.vercel.app)
+5. Plan topup ($100/$500/$1000/month)
+6. Make first deposit
+
+Any stuck? Hit me up anytime 📞
+
+Welcome to TOL LANGIT ETF! 💎🚀
+
+═══════════════════════════════════════════════════════════

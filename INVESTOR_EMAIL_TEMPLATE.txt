@@ -1,0 +1,166 @@
+Subject: Welcome to TOL LANGIT ETF — Your Account is Ready
+
+---
+
+Hi [Investor Name],
+
+Welcome to TOL LANGIT ETF. Your account is set up and ready to trade.
+
+Below is everything you need to get started in the next 24 hours.
+
+---
+
+## QUICK START (Next 30 Minutes)
+
+### 1. Download MetaTrader 5
+Go to: https://www.metatrader5.com
+Download for Windows, Mac, or mobile.
+
+### 2. Login to Your Account
+Open MT5 → File → Login to Trading Account
+
+Enter:
+  Login:  8011691
+  Server: ICMarketsSC-MT5-3
+  Password: [Your IC Markets Password]
+
+Click OK.
+
+### 3. You're In
+You should see:
+  • Your Account Balance
+  • Your Equity (live account value)
+  • Trades (if the market is open, you'll see live positions)
+
+### 4. Watch the Dashboard
+Open your browser: https://tol-langit-etf.vercel.app/
+
+Navigate to "ETF GOLD" tab. This is YOUR account live.
+
+---
+
+## WHAT TO EXPECT
+
+✅ **What You'll See in MT5:**
+  • Open trades (XAUUSD, AUDCAD pairs)
+  • Closed trade history
+  • Daily profit/loss updates
+  • Automatic position sizing
+
+✅ **What the EA Does:**
+  • Trades automatically 24/5
+  • Runs on a remote professional server
+  • No setup or installation needed from you
+  • All trades visible in MT5 and on the dashboard
+
+✅ **What You Should Do:**
+  • Check your account once a week (don't obsess)
+  • Make a monthly deposit (see below)
+  • Hold for 12+ months (short-term swings are normal)
+
+---
+
+## MONTHLY TOP-UP SYSTEM (The "ETF" Part)
+
+This isn't a traditional managed account. It's ETF-style: transparent, owner-verified, and disciplined.
+
+### How It Works
+Every month, you add capital. The EA automatically scales position sizes.
+
+Example:
+  Month 1: Deposit $1,000 → EA trades at 0.1 lot size
+  Month 2: You earn +$200, deposit +$500 → Account = $1,700 → EA scales to 0.17 lots
+  Month 3: You earn +$100, deposit +$500 → Account = $2,300 → EA scales to 0.23 lots
+
+Result: Compounding growth through consistent monthly additions.
+
+### Pick a Plan
+
+**Starter ($100/month)**
+  • Best for: Testing the system
+  • 5-year target: ~$1,500–$2,000
+
+**Builder ($500/month)**
+  • Best for: Serious wealth building
+  • 5-year target: ~$7,500–$10,000
+
+**Serious Compounding ($1,000+/month)**
+  • Best for: Long-term investors
+  • 5-year target: ~$15,000–$25,000+
+
+### How to Deposit
+  1. Log into IC Markets: https://icmarkets.com
+  2. Click "Deposit"
+  3. Choose amount and payment method
+  4. Wait 1–2 hours for funds to appear in MT5
+
+---
+
+## KEY METRICS
+
+• **Drawdown:** ~42% (max historical decline). This is normal. Don't panic if your account drops 40% — it always recovers.
+• **Win Rate:** ~78% (about 3 wins for every 1 loss)
+• **Monthly Return:** ~73% average, but highly variable. Some months 0%, others +200%.
+• **Profit Factor:** 2.34 (you earn $2.34 gross for every $1 you lose)
+
+---
+
+## VERIFY IT'S REAL
+
+All data is transparent and auditable:
+
+  • Dashboard: https://tol-langit-etf.vercel.app/
+  • ETF GOLD Myfxbook: https://www.myfxbook.com/members/adithyodw/tol-langit-etf-gold/12042787
+  • V10 Myfxbook: https://www.myfxbook.com/members/adithyodw/tol-langit-v10/8671765
+
+Your money is held at IC Markets (ASIC-regulated broker), not by Adithyo or TOL LANGIT.
+
+---
+
+## OPTIONAL: 24/7 VPS HOSTING
+
+To run the EA 24/5 without your computer on:
+
+  1. Open MT5
+  2. Tools → Options → Server → VPS
+  3. Click "Rent" and subscribe to MetaQuotes VPS (~$15–30/month)
+
+This is optional but recommended for best results.
+
+---
+
+## FIRST WEEK CHECKLIST
+
+  □ Download and login to MT5 (30 min)
+  □ Verify trades are running (next day)
+  □ Visit dashboard and see your account (5 min)
+  □ Plan your monthly top-up amount ($100–$1,000)
+  □ Make your first deposit (1 week)
+  □ Set up VPS if desired (optional)
+
+---
+
+## SUPPORT
+
+Questions? Reach out:
+
+  • Email: adithyodw@gmail.com
+  • Telegram: @tol_langit
+  • Discord: [Link, if available]
+
+---
+
+**Important Reminders:**
+
+1. **Your capital is always yours.** You own the account. IC Markets is the broker, not Adithyo.
+2. **Drawdown is normal.** 30–42% temporary declines happen. Don't panic-sell.
+3. **Top up monthly.** Consistency beats timing.
+4. **Hold long-term.** Minimum 12 months. Short-term swings are high volatility.
+5. **No manual trading.** Let the EA run. Don't add your own trades.
+
+---
+
+Welcome aboard. Your journey to disciplined, systematic wealth building starts now.
+
+Best regards,
+Adithyo

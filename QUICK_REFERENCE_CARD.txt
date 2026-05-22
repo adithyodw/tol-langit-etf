@@ -1,0 +1,142 @@
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║                  TOL LANGIT ETF — QUICK REFERENCE CARD                          ║
+║                            (Save This Document)                                 ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│ YOUR ACCOUNT CREDENTIALS                                                        │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│ Login:    8011691                                                               │
+│ Server:   ICMarketsSC-MT5-3                                                     │
+│ Password: [Your IC Markets Password]                                            │
+│ Broker:   IC Markets (ASIC Regulated)                                           │
+│ Platform: MetaTrader 5 (MT5)                                                    │
+│ Currency: USD                                                                   │
+│ Product:  ETF GOLD (XAUUSD + AUDCAD)                                            │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│ STEP 1: DOWNLOAD & LOGIN (30 MINUTES)                                           │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│ 1. Visit: https://www.metatrader5.com                                           │
+│ 2. Download MetaTrader 5 (your OS)                                              │
+│ 3. Open MT5 → File → Login to Trading Account                                   │
+│ 4. Enter credentials above                                                      │
+│ 5. Click OK                                                                     │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│ STEP 2: VERIFY YOU'RE TRADING (NEXT DAY)                                        │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│ In MT5, click "Trades" tab:                                                     │
+│   ✓ Should see open positions (XAUUSD, AUDCAD)                                  │
+│   ✓ Should show lot size (0.1–2.0 depending on balance)                         │
+│   ✓ Should show real-time profit/loss                                           │
+│                                                                                 │
+│ Click "History" tab:                                                            │
+│   ✓ Should see closed trades                                                    │
+│   ✓ Mix of wins (75%) and losses (25%)                                          │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│ STEP 3: WATCH THE DASHBOARD (5 MINUTES)                                         │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│ Open: https://tol-langit-etf.vercel.app/                                        │
+│ Navigate to: ETF GOLD                                                           │
+│ See: Your live account balance, equity, recent trades, monthly returns          │
+│ Updates: Every 2–5 minutes (synced with Myfxbook)                               │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│ MONTHLY TOP-UP SCHEDULE                                                         │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│ Pick ONE of these and stick to it:                                              │
+│                                                                                 │
+│ STARTER:         $100/month   →  5-year target: $1,500–$2,000                   │
+│ BUILDER:         $500/month   →  5-year target: $7,500–$10,000                  │
+│ SERIOUS:         $1,000+/mo   →  5-year target: $15,000–$25,000+                │
+│                                                                                 │
+│ How to Deposit:                                                                 │
+│   1. Log in: https://icmarkets.com                                              │
+│   2. Click: Deposit                                                             │
+│   3. Enter: Amount + payment method                                             │
+│   4. Wait: 1–2 hours for MT5 to update                                          │
+│   5. Done: Position sizes auto-scale                                            │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│ ACCOUNT PERFORMANCE METRICS                                                     │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│ Gain (Total):          +411.29% (since Feb 2026)                                │
+│ Absolute Gain:         +193.65%                                                 │
+│ Monthly Average:       +73.67% (highly variable month-to-month)                 │
+│ Daily Average:         +1.87%                                                   │
+│ Drawdown (Max):        42.06% (temporary, normal, always recovers)              │
+│ Win Rate:              78% (about 3 wins per 4 trades)                          │
+│ Profit Factor:         2.34 (earn $2.34 gross per $1 lost)                      │
+│ Recent Trades:         470+ since launch                                        │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│ IMPORTANT DO's & DON'Ts                                                         │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│ ✅ DO:                              │ ❌ DON'T:                                 │
+│   • Top up monthly                  │   • Panic during 30–40% drawdowns        │
+│   • Check account weekly            │   • Expect 70% monthly (outlier)         │
+│   • Hold 12+ months minimum         │   • Trade manually alongside EA          │
+│   • Use VPS for 24/5 trading        │   • Try to modify the EA                 │
+│   • Verify data on Myfxbook         │   • Withdraw in first 3 months          │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│ OPTIONAL: 24/7 VPS SETUP (15 MINUTES)                                           │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│ Enables EA to run 24/5 even if your computer is off                             │
+│ Cost: ~$15–30/month                                                             │
+│ Setup:                                                                          │
+│   1. MT5 → Tools → Options → Server tab                                         │
+│   2. Click "VPS" button                                                         │
+│   3. Select MetaQuotes VPS → Click "Rent"                                       │
+│   4. Pay and confirm                                                            │
+│   5. Done (MT5 auto-installs on remote server)                                  │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│ VERIFY IT'S REAL & AUDITABLE                                                    │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│ Your money: IC Markets (ASIC-regulated broker)                                  │
+│ Not held by: Adithyo or TOL LANGIT                                              │
+│ Verifiable statements:                                                          │
+│   • Dashboard: https://tol-langit-etf.vercel.app/                               │
+│   • Myfxbook:  https://www.myfxbook.com/.../tol-langit-etf-gold/12042787        │
+│   • Operator:  Adithyo Dewangga Wijaya (5+ years verified track record)         │
+│   • Public:    All data auditable, not hidden                                   │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│ SUPPORT & QUESTIONS                                                             │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│ Email:    adithyodw@gmail.com                                                   │
+│ Telegram: @tol_langit                                                           │
+│ Discord:  [Link, if available]                                                  │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│ FIRST WEEK CHECKLIST                                                            │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│ □ Download MT5 (https://www.metatrader5.com)                                    │
+│ □ Login with your credentials                                                   │
+│ □ Verify trades are running                                                     │
+│ □ Open dashboard: https://tol-langit-etf.vercel.app/                            │
+│ □ Navigate to "ETF GOLD" and see your account                                   │
+│ □ Plan your monthly top-up amount ($100, $500, or $1,000+)                      │
+│ □ Make your first deposit via IC Markets                                        │
+│ □ Set up VPS (optional but recommended)                                         │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════════════════════════
+
+                    Welcome to Systematic Wealth Building.
+                      Your account is ready. Let's go. 🚀
+
+═══════════════════════════════════════════════════════════════════════════════════

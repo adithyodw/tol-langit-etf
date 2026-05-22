@@ -1,0 +1,105 @@
+🚀 TOL LANGIT ETF — Account Setup
+
+You can access your trading account below:
+
+Login: 8011691
+Password:
+Server: ICMarketsSC-MT5-3
+
+───────────────────────────────────────────────────────────
+
+📱 How to install & login (MT5 Mobile):
+
+1. Download "MetaTrader 5"
+   • iPhone: App Store
+   • Android: Google Play Store
+
+2. Open the app
+
+3. Tap "Login to existing account"
+
+4. Search and select server:
+   ICMarketsSC-MT5-3
+
+5. Enter your login details:
+   Login: 8011691
+   Password: (provided separately)
+
+6. Done — you can view your account ✓
+
+───────────────────────────────────────────────────────────
+
+💻 Desktop Login:
+
+1. Download: metatrader5.com
+
+2. Open MetaTrader 5
+
+3. File → Login to Trading Account
+
+4. Enter:
+   Login: 8011691
+   Server: ICMarketsSC-MT5-3
+   Password: (provided separately)
+
+5. Click OK
+
+───────────────────────────────────────────────────────────
+
+📊 View Your Account:
+
+Platform: https://tol-langit-etf.vercel.app/
+
+Log in and navigate to "ETF GOLD" to see your:
+• Account balance
+• Live trades
+• Monthly returns
+• Performance metrics
+
+───────────────────────────────────────────────────────────
+
+⚠️ Risk Notice:
+
+Trading involves high risk due to leverage (1:500).
+
+You may lose part or all of your capital.
+
+Please invest only what you can afford to lose.
+
+Past performance is not guaranteed.
+
+Drawdown of 30-40% is normal and expected.
+
+───────────────────────────────────────────────────────────
+
+💡 Monthly Topup System:
+
+To maximize returns, contribute monthly:
+
+• $100/month (Starter)
+• $500/month (Builder)
+• $1,000+/month (Serious Compounding)
+
+Lot sizes auto-scale with your account balance.
+
+Consistent monthly contributions = Compound growth
+
+───────────────────────────────────────────────────────────
+
+📞 Support:
+
+Questions? Contact:
+📧 Email: adithyodw@gmail.com
+📱 Telegram: @tol_langit
+💬 WhatsApp: This chat
+
+───────────────────────────────────────────────────────────
+
+✅ Ready to get started?
+
+1. Download MT5
+2. Login with credentials above
+3. Visit platform to see live account
+4. Plan your monthly topup
+
+Let me know if you need any help! 🚀
