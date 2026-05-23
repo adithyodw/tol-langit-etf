@@ -7,6 +7,10 @@
 // Only values copied directly from a Myfxbook Monthly Analytics surface are
 // recorded here. Omitted months mean no verified monthly bar was visible in
 // Myfxbook for that account/year at the time of capture.
+//
+// FUTURE: When Myfxbook API adds monthly breakdown endpoint, this file becomes
+// a fallback/seed. The API (api/myfxbook/sync.ts) will fetch live monthly data,
+// and mergeMonthly() will overlay it on top. For now: static verified data only.
 
 export type MonthlyByYear = Record<number, Partial<Record<number, number>>>;
 

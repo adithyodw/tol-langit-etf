@@ -22,6 +22,14 @@
 //   - get-open-orders.json  (best-effort)
 //   - get-history.json      (best-effort)
 //   - logout.json           (cleanup)
+//
+// TODO: Monthly breakdown endpoint
+//   Myfxbook API does NOT currently expose monthly returns directly.
+//   Monthly data is displayed on portfolio pages but not via API.
+//   When (if) Myfxbook adds a monthly endpoint (e.g., get-monthly-gains.json),
+//   fetch it here and populate monthlyByYear in the response.
+//   Until then: client uses verified static data from src/data/monthlyReturns.ts
+//   merged via mergeMonthly() which overlays any live monthly data on top.
 import { VercelRequest, VercelResponse } from '@vercel/node';
 
 // Allow the function enough wall-clock time to complete the worst-case
