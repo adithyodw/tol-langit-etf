@@ -396,51 +396,6 @@ function buildSummary(
   };
 }
 
-// Build monthly returns from closed trade history by calculating
-// month-by-month profit aggregation. This is a best-effort calculation
-// since Myfxbook API doesn't expose monthly breakdown directly.
-function buildMonthlyReturns(
-  history: NormalisedTrade[],
-  startingBalance: number
-): MonthlyByYear {
-  if (!history.length || startingBalance <= 0) return {};
-
-  // Group trades by year-month
-  const byMonth = new Map<string, { profit: number; commission: number }>();
-  for (const trade of history) {
-    if (trade.status !== 'closed' || !trade.closeTime) continue;
-    const closeDate = new Date(trade.closeTime);
-    const year = closeDate.getUTCFullYear();
-    const month = closeDate.getUTCMonth() + 1;
-    const key = `${year}-${month}`;
-
-    const existing = byMonth.get(key) ?? { profit: 0, commission: 0 };
-    existing.profit += trade.profit || 0;
-    existing.commission += (trade.commission || 0);
-    byMonth.set(key, existing);
-  }
-
-  // Convert to percent returns (best-effort: use starting balance as proxy)
-  const result: MonthlyByYear = {};
-  for (const [key, data] of byMonth.entries()) {
-    const [yearStr, monthStr] = key.split('-');
-    const year = Number(yearStr);
-    const month = Number(monthStr);
-
-    if (!result[year]) result[year] = {};
-
-    // Net profit = gross profit - commission
-    const netProfit = data.profit - data.commission;
-    const returnPct = (netProfit / startingBalance) * 100;
-
-    // Only store if plausible (guard against corrupt data)
-    if (returnPct > -100 && returnPct < 1000) {
-      result[year][month] = Math.round(returnPct * 100) / 100;
-    }
-  }
-
-  return result;
-}
 
 interface AccountFeeds {
   open: NormalisedTrade[];
@@ -528,29 +483,29 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       fetchAccountFeeds(session, goldId),
     ]);
 
-    const v10Summary = buildSummary(v10Account, v10Feeds.history);
-    const goldSummary = buildSummary(goldAccount, goldFeeds.history);
-
     const v10Payload: NormalisedAccountPayload = {
       ...v10Account,
       id: v10Id,
       name: 'TOL LANGIT V10',
-      summary: v10Summary,
+      summary: buildSummary(v10Account, v10Feeds.history),
       openTrades: v10Feeds.open,
       openOrders: v10Feeds.orders,
       history: v10Feeds.history,
-      monthlyByYear: buildMonthlyReturns(v10Feeds.history, v10Summary.balance),
+      // Monthly data is stable (doesn't change after month ends).
+      // Use verified static data from src/data/monthlyReturns.ts instead
+      // of recalculating from trades (prone to rounding errors).
+      monthlyByYear: {},
     };
 
     const goldPayload: NormalisedAccountPayload = {
       ...goldAccount,
       id: goldId,
       name: 'TOL LANGIT ETF GOLD',
-      summary: goldSummary,
+      summary: buildSummary(goldAccount, goldFeeds.history),
       openTrades: goldFeeds.open,
       openOrders: goldFeeds.orders,
       history: goldFeeds.history,
-      monthlyByYear: buildMonthlyReturns(goldFeeds.history, goldSummary.balance),
+      monthlyByYear: {},
     };
 
     res.setHeader('Cache-Control', 's-maxage=600, stale-while-revalidate=86400');

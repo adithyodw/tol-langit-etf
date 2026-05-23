@@ -87,7 +87,7 @@ export const GOLD_MONTHLY: MonthlyByYear = {
     2: 24.87,
     3: -17.89,
     4: 190.85,
-    5: 71.44,
+    5: 66.51,
   },
 };
 
