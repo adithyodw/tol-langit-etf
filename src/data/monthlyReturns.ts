@@ -82,7 +82,7 @@ export const V10_MONTHLY: MonthlyByYear = {
     1: 4.65,
     2: 1.88,
     3: 2.65,
-    5: 5.87,
+    5: 7.21,
   },
 };
 
@@ -91,7 +91,7 @@ export const GOLD_MONTHLY: MonthlyByYear = {
     2: 24.87,
     3: -17.89,
     4: 190.85,
-    5: 66.51,
+    5: 57.06,
   },
 };
 

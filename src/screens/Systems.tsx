@@ -6,6 +6,37 @@ interface Props {
   gold: SignalStats;
 }
 
+// ── Clean institutional stroke icons (no emoji) ──────────────────────────
+const ICON_PROPS = {
+  width: 20,
+  height: 20,
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  stroke: 'currentColor',
+  strokeWidth: 1.6,
+  strokeLinecap: 'round' as const,
+  strokeLinejoin: 'round' as const,
+};
+
+const IconLayers = (
+  <svg {...ICON_PROPS}><path d="M12 3 3 8l9 5 9-5-9-5Z" /><path d="m3 13 9 5 9-5" /><path d="m3 16.5 9 5 9-5" opacity="0.5" /></svg>
+);
+const IconCpu = (
+  <svg {...ICON_PROPS}><rect x="5" y="5" width="14" height="14" rx="2" /><rect x="9" y="9" width="6" height="6" rx="1" /><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3" /></svg>
+);
+const IconShield = (
+  <svg {...ICON_PROPS}><path d="M12 3 5 6v5c0 4 3 7 7 9 4-2 7-5 7-9V6l-7-3Z" /><path d="m9 12 2 2 4-4" /></svg>
+);
+const IconScale = (
+  <svg {...ICON_PROPS}><path d="M4 20h16" /><path d="M7 20v-6M12 20V8M17 20v-9" /><path d="M5 11h4M10 5h4M15 8h4" opacity="0.5" /></svg>
+);
+const IconCode = (
+  <svg {...ICON_PROPS}><path d="m8 7-5 5 5 5M16 7l5 5-5 5M14 4l-4 16" /></svg>
+);
+const IconLedger = (
+  <svg {...ICON_PROPS}><path d="M6 3h9l4 4v14H6z" /><path d="M14 3v5h5" /><path d="M9 13h6M9 16.5h6" opacity="0.7" /></svg>
+);
+
 // ETF composite (50/50 weight): each product's instrument exposures halved.
 const BLENDED_ALLOC = [
   { pair: 'XAUUSD', weight: 42, color: '#caa64a' },
@@ -80,24 +111,32 @@ export function Systems({ v10, gold }: Props) {
         <div className="pillar">
           <div className="pillar-num mono">01</div>
           <div>
-            <div className="pillar-h">Myfxbook-verified execution</div>
-            <div className="pillar-p">Every fill on broker accounts #{v10.brokerAccount} (V10) and #{gold.brokerAccount} (Gold) lands on Myfxbook within seconds. No off-book PnL, no edited history — the statement you audit is the statement you replicate.</div>
+            <div className="pillar-h">Multi-module signal fusion</div>
+            <div className="pillar-p">Five independent engines score every setup — institutional liquidity-sweep mapping, cumulative order-flow and absorption, Wyckoff accumulation/distribution, and multi-timeframe anchored VWAP. A trade is only considered when these modules reach consensus, not on a single indicator.</div>
           </div>
         </div>
         <div className="hr h" />
         <div className="pillar">
           <div className="pillar-num mono">02</div>
           <div>
-            <div className="pillar-h">Two uncorrelated engines</div>
-            <div className="pillar-p">V10 — multi-pair FX basket on MT4 (SGD), 5-year verified live track since July 2021. ETF Gold — XAUUSD with an AUDCAD overlay on MT5 (USD). Holding both smooths each engine's drawdowns.</div>
+            <div className="pillar-h">AI as a risk filter, not a fortune-teller</div>
+            <div className="pillar-p">A 7-feature online logistic-regression layer with a Shannon-entropy market-quality gate sits on top of the modules. It never picks direction on its own — it screens out noisy, low-probability conditions and modulates risk. Learning only activates after a minimum live-trade sample.</div>
           </div>
         </div>
         <div className="hr h" />
         <div className="pillar">
           <div className="pillar-num mono">03</div>
           <div>
-            <div className="pillar-h">Discretionary risk overlay</div>
-            <div className="pillar-p">When a macro regime breaks, systems are paused — never over-fitted to the last drawdown. The composite is a deliberate portfolio decision, not a black-box bet.</div>
+            <div className="pillar-h">Single-position institutional risk</div>
+            <div className="pillar-p">One open position at a time, 1–3% risk per trade, broker stop/freeze-level aware, with daily loss limits. Size is volatility-adjusted and can scale via Bayesian Kelly from the account's own win-rate and reward history — discipline enforced in code, not emotion.</div>
+          </div>
+        </div>
+        <div className="hr h" />
+        <div className="pillar">
+          <div className="pillar-num mono">04</div>
+          <div>
+            <div className="pillar-h">Verifiable by design</div>
+            <div className="pillar-p">Every fill on broker accounts #{v10.brokerAccount} (V10) and #{gold.brokerAccount} (Gold) streams to Myfxbook within seconds, and a full JSON journal records each module's score, AI confidence, regime and P&L. The statement you audit is the statement you replicate.</div>
           </div>
         </div>
       </div>
@@ -117,53 +156,63 @@ export function Systems({ v10, gold }: Props) {
       </div>
       <div className="card engine-card">
         <div className="engine-header">
-          <div className="engine-icon">⚙</div>
+          <div className="engine-icon">{IconCpu}</div>
           <div>
             <div className="engine-title">LQS AI Institutional Engine</div>
-            <div className="engine-sub">The algorithmic core powering both TOL LANGIT products</div>
+            <div className="engine-sub">Open-source algorithmic core · v5.0 · powering both products</div>
           </div>
         </div>
 
         <div className="engine-body">
           <p className="engine-lead">
-            The strategy logic is <strong>fully open source</strong>. Every rule, every risk limit, every entry and exit condition is published on GitHub — readable by anyone, auditable by everyone.
+            The strategy logic is <strong>fully open source</strong>. Every rule, risk limit, entry and exit condition is published on GitHub — readable by anyone, auditable by everyone.
           </p>
 
           <div className="engine-pillars">
             <div className="engine-pillar">
-              <div className="engine-pillar-icon">🔓</div>
+              <div className="engine-pillar-icon">{IconLayers}</div>
               <div>
-                <div className="engine-pillar-h">No Black Box</div>
-                <div className="engine-pillar-p">The code that runs on the broker is the same code on GitHub. You can read exactly what the EA does before investing a single dollar.</div>
+                <div className="engine-pillar-h">Five-module signal fusion</div>
+                <div className="engine-pillar-p">Liquidity sweeps, order flow, Wyckoff phases and anchored VWAP must align before any entry. No single indicator can fire a trade on its own.</div>
               </div>
             </div>
             <div className="engine-pillar">
-              <div className="engine-pillar-icon">🏦</div>
+              <div className="engine-pillar-icon">{IconCpu}</div>
               <div>
-                <div className="engine-pillar-h">Institutional-Grade Risk</div>
-                <div className="engine-pillar-p">Built with the same risk management concepts used by professional funds — dynamic position sizing, volatility-adjusted lot calculation, and hard drawdown limits built in at the code level.</div>
+                <div className="engine-pillar-h">AI decision layer</div>
+                <div className="engine-pillar-p">A logistic-regression model with a Shannon-entropy filter screens out noisy, low-probability markets. It adjusts risk — it never overrides the strategy's direction.</div>
               </div>
             </div>
             <div className="engine-pillar">
-              <div className="engine-pillar-icon">🤖</div>
+              <div className="engine-pillar-icon">{IconShield}</div>
               <div>
-                <div className="engine-pillar-h">AI-Assisted Regime Detection</div>
-                <div className="engine-pillar-p">The engine reads market structure in real time — ranging vs. trending, low vs. high volatility. It adapts its behaviour to fit current conditions rather than using fixed rules that break during market regime shifts.</div>
+                <div className="engine-pillar-h">Institutional risk control</div>
+                <div className="engine-pillar-p">One position at a time, 1–3% risk per trade, daily loss limits and broker-aware stop handling. Drawdown discipline is built into the code, not left to emotion.</div>
               </div>
             </div>
             <div className="engine-pillar">
-              <div className="engine-pillar-icon">📐</div>
+              <div className="engine-pillar-icon">{IconScale}</div>
               <div>
-                <div className="engine-pillar-h">Equity-Scaled Sizing</div>
-                <div className="engine-pillar-p">Lot sizes are calculated as a fraction of your live equity — they grow automatically as your account grows. No manual adjustments needed when you top up monthly.</div>
+                <div className="engine-pillar-h">Equity-scaled sizing</div>
+                <div className="engine-pillar-p">Lot size is a fixed fraction of live equity (e.g. 0.01 lot per $1,000), so exposure grows as the account grows and contracts automatically in drawdown.</div>
+              </div>
+            </div>
+            <div className="engine-pillar">
+              <div className="engine-pillar-icon">{IconLedger}</div>
+              <div>
+                <div className="engine-pillar-h">Full audit trail</div>
+                <div className="engine-pillar-p">Every trade writes a JSON record — module scores, AI confidence, entry/exit, regime and P&L — so performance can be independently reviewed, not just claimed.</div>
               </div>
             </div>
           </div>
 
           <div className="engine-why">
-            <div className="engine-why-title">Why does open source matter for an investor?</div>
+            <div className="engine-why-title">
+              <span className="engine-why-icon">{IconCode}</span>
+              Why open source matters for an investor
+            </div>
             <p className="engine-why-body">
-              Most trading products hide their strategy. You're asked to trust a track record without seeing why it works. With LQS AI, you can verify the logic yourself — or have any developer do it for you. The Myfxbook statement proves <em>what</em> happened; the GitHub repo proves <em>how and why</em>.
+              Most trading products hide their strategy. You're asked to trust a track record without seeing why it works. With LQS AI you can verify the logic yourself — or have any developer do it for you. The Myfxbook statement proves <em>what</em> happened; the open repository proves <em>how and why</em>.
             </p>
             <a
               href="https://github.com/adithyodw/LQS-AI-INSTITUTIONAL-ENGINE"
@@ -171,7 +220,7 @@ export function Systems({ v10, gold }: Props) {
               rel="noopener noreferrer"
               className="engine-gh-btn"
             >
-              View Source on GitHub ↗
+              View source on GitHub ↗
             </a>
           </div>
         </div>

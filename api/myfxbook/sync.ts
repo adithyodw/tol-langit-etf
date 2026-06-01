@@ -25,10 +25,11 @@
 //   - logout.json           (cleanup)
 //
 // Monthly returns:
-//   get-daily-gain.json returns cumulative absolute gain % for each day.
-//   We chain-link adjacent month-end values to derive each calendar month's
-//   return: monthly% = ((100 + endGain) / (100 + prevEndGain) - 1) * 100
-//   This exactly replicates what Myfxbook shows in Monthly Analytics.
+//   get-daily-gain.json returns one { date, value } per trading day, where
+//   `value` is the gain % for that day. We compound the daily values inside
+//   each calendar month to get the monthly return:
+//     monthly% = ( ∏(1 + dailyValue/100) - 1 ) × 100
+//   This exactly replicates Myfxbook's "Monthly Gain (Change)" chart.
 import { VercelRequest, VercelResponse } from '@vercel/node';
 
 // Allow the function enough wall-clock time to complete the worst-case
@@ -404,47 +405,90 @@ function buildSummary(
 }
 
 
+interface DailyGainPoint {
+  date?: string;
+  value?: number;
+  profit?: number;
+  [key: string]: unknown;
+}
+
 interface DailyGainResponse {
   error?: boolean;
   message?: string;
-  dailyGain?: Array<[string, number]>;
+  // Myfxbook returns a NESTED array: each element is a one-item array
+  // containing { date, value, profit }. We parse defensively for several
+  // possible shapes so a format tweak on their side can't silently break us.
+  dailyGain?: unknown;
 }
 
-// Convert Myfxbook cumulative daily gains into calendar-month returns.
-// get-daily-gain.json returns [dateStr, cumulativeAbsGainPct] per trading day.
-// We take the last value each month, then chain-link adjacent months:
-//   monthly% = ((100 + endGain) / (100 + prevMonthEndGain) - 1) × 100
-// This reproduces exactly the figures shown in Myfxbook Monthly Analytics.
-function buildMonthlyFromCumulativeGain(
-  dailyGain: Array<[string, number]>
-): MonthlyByYear {
-  const monthEnd = new Map<string, { year: number; month: number; gain: number }>();
+// Parse the day, gain-percent pairs out of whatever shape Myfxbook returns.
+// Real format: dailyGain = [ [{date:"MM/DD/YYYY", value:0.46, profit:..}], ... ]
+// where `value` is the gain % for THAT day. We also tolerate flat objects
+// and [dateStr, number] tuples just in case.
+function extractDailyPoints(dailyGain: unknown): Array<{ date: string; value: number }> {
+  if (!Array.isArray(dailyGain)) return [];
+  const points: Array<{ date: string; value: number }> = [];
 
-  for (const [dateStr, gain] of dailyGain) {
-    if (typeof gain !== 'number' || !Number.isFinite(gain)) continue;
-    const d = new Date(dateStr);
-    if (Number.isNaN(d.getTime())) continue;
-    const year = d.getUTCFullYear();
-    const month = d.getUTCMonth() + 1;
-    const key = `${year}-${String(month).padStart(2, '0')}`;
-    monthEnd.set(key, { year, month, gain }); // last entry each month wins
+  const pushFromObject = (obj: DailyGainPoint) => {
+    const date = obj.date;
+    const value = typeof obj.value === 'number' ? obj.value : Number(obj.value);
+    if (typeof date === 'string' && Number.isFinite(value)) {
+      points.push({ date, value });
+    }
+  };
+
+  for (const entry of dailyGain) {
+    if (Array.isArray(entry)) {
+      // Nested: [{date,value,profit}]  — the documented Myfxbook shape
+      if (entry.length && typeof entry[0] === 'object' && entry[0] !== null) {
+        pushFromObject(entry[0] as DailyGainPoint);
+      } else if (entry.length >= 2 && typeof entry[0] === 'string' && typeof entry[1] === 'number') {
+        // Tuple fallback: [dateStr, number]
+        points.push({ date: entry[0], value: entry[1] });
+      }
+    } else if (entry && typeof entry === 'object') {
+      // Flat object fallback
+      pushFromObject(entry as DailyGainPoint);
+    }
+  }
+  return points;
+}
+
+// Parse "MM/DD/YYYY" or "YYYY-MM-DD" into a {year, month} in a timezone-safe way.
+function parseYearMonth(dateStr: string): { year: number; month: number } | null {
+  const slash = dateStr.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  if (slash) return { month: Number(slash[1]), year: Number(slash[3]) };
+  const iso = dateStr.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if (iso) return { year: Number(iso[1]), month: Number(iso[2]) };
+  const d = new Date(dateStr);
+  if (!Number.isNaN(d.getTime())) return { year: d.getUTCFullYear(), month: d.getUTCMonth() + 1 };
+  return null;
+}
+
+// Compound each day's gain inside its calendar month to get the monthly return.
+// This is exactly how Myfxbook computes "Monthly Gain (Change)":
+//   monthly% = ( ∏(1 + dailyValue/100) - 1 ) × 100
+function buildMonthlyFromDailyGain(dailyGain: unknown): MonthlyByYear {
+  const points = extractDailyPoints(dailyGain);
+  if (!points.length) return {};
+
+  const factors = new Map<string, { year: number; month: number; factor: number }>();
+  for (const { date, value } of points) {
+    const ym = parseYearMonth(date);
+    if (!ym) continue;
+    const key = `${ym.year}-${String(ym.month).padStart(2, '0')}`;
+    const cur = factors.get(key) ?? { year: ym.year, month: ym.month, factor: 1 };
+    cur.factor *= 1 + value / 100;
+    factors.set(key, cur);
   }
 
-  const entries = Array.from(monthEnd.values()).sort((a, b) =>
-    a.year !== b.year ? a.year - b.year : a.month - b.month
-  );
-
   const result: MonthlyByYear = {};
-  let prevGain = 0;
-
-  for (const { year, month, gain } of entries) {
-    const monthlyReturn = ((100 + gain) / (100 + prevGain) - 1) * 100;
-    prevGain = gain;
+  for (const { year, month, factor } of factors.values()) {
+    const monthlyReturn = (factor - 1) * 100;
     if (monthlyReturn <= -100 || monthlyReturn >= 1000) continue; // plausibility guard
     if (!result[year]) result[year] = {};
     result[year][month] = Math.round(monthlyReturn * 100) / 100;
   }
-
   return result;
 }
 
@@ -464,10 +508,10 @@ async function fetchMonthlyReturns(
       `&start=${startDate}` +
       `&end=${today}`;
     const data = await safeJson<DailyGainResponse>(url, FEED_TIMEOUT_MS);
-    if (!data || data.error || !Array.isArray(data.dailyGain) || !data.dailyGain.length) {
+    if (!data || data.error || !Array.isArray(data.dailyGain)) {
       return {};
     }
-    return buildMonthlyFromCumulativeGain(data.dailyGain);
+    return buildMonthlyFromDailyGain(data.dailyGain);
   } catch {
     return {};
   }

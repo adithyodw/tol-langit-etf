@@ -58,7 +58,7 @@ export function Signals({ v10, gold, onOpen }: Props) {
       </div>
 
       <div className="footnote sm-pad" style={{ paddingTop: 0 }}>
-        Two independent live products inside the TOL LANGIT ETF wrapper. Each one is publicly verified on Myfxbook and replicable across MQL5, SignalStart, and ZuluTrade. No pooled capital, no managed accounts — investors copy the same broker fills you can audit on the live statement.
+        Two independent live strategies inside the TOL LANGIT ETF wrapper. Each is publicly verified on Myfxbook and mirrored on MQL5. No pooled capital and no managed accounts — investors simply copy the same broker fills you can audit on the live statement.
       </div>
 
       <div className="section-label">
@@ -69,6 +69,41 @@ export function Signals({ v10, gold, onOpen }: Props) {
         {list.map(s => (
           <ProductCard key={s.id} s={s} onOpen={() => onOpen(s.id)} />
         ))}
+      </div>
+
+      <div className="section-label"><span>What You're Investing In</span></div>
+      <div className="card explain-card">
+        <div className="explain-block">
+          <div className="explain-h">
+            <span className="explain-dot" style={{ background: '#0a1f3d' }} />
+            {v10.name}
+            <span className="explain-tag">Core</span>
+          </div>
+          <p className="explain-p">
+            A multi-pair forex strategy that has traded live for more than five years. It spreads risk across eight major currency pairs and aims for steady, compounding growth rather than big one-off swings. Think of it as the <strong>stable core</strong> of the portfolio — the role a conservative, broadly-diversified holding plays in a serious investment book.
+          </p>
+        </div>
+        <div className="hr h" />
+        <div className="explain-block">
+          <div className="explain-h">
+            <span className="explain-dot" style={{ background: '#b89a4e' }} />
+            {gold.name}
+            <span className="explain-tag gold">Growth satellite</span>
+          </div>
+          <p className="explain-p">
+            A specialist gold (XAUUSD) engine with an AUDCAD overlay. It targets higher returns by trading gold's volatility through strict, rules-based execution — no grid, no martingale, one position at a time. Think of it as the <strong>focused growth satellite</strong> that sits alongside the stable core for investors who want more upside and can sit through deeper swings.
+          </p>
+        </div>
+      </div>
+
+      <div className="section-label"><span>Why Verification Matters</span></div>
+      <div className="card trust-card">
+        <p className="trust-lead">
+          Anyone can post screenshots or claim a winning track record. Very few can show a <strong>live, independently-tracked account that cannot be edited after the fact.</strong>
+        </p>
+        <p className="trust-p">
+          Both TOL LANGIT products stream every trade to Myfxbook in real time and are mirrored on MQL5. The numbers on this app are not marketing — they are pulled from those same public, third-party records. If a strategy is not verified on a platform like Myfxbook or MQL5, treat its performance claims as <em>unproven</em>.
+        </p>
       </div>
 
       <div className="section-label"><span>Verification</span></div>

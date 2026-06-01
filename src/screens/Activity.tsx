@@ -115,7 +115,8 @@ function buildView(
     rowsForFilter: liveRows.length > 0 ? liveRows : fallbackRows,
     productLabel,
     isLive: liveRows.length > 0 && liveSource,
-    statementUrl: signal.myfxbookStatementUrl,
+    // Public Myfxbook portfolio page (anyone can open it — no login required).
+    statementUrl: signal.myfxbookUrl,
   };
 }
 
@@ -193,7 +194,7 @@ export function Activity({ v10Feed, goldFeed, source }: Props) {
       )}
 
       <div className="footnote">
-        Mirror of the Myfxbook account statements for #{V10.myfxbookAccountId} (V10 · {V10.currency}) and #{GOLD.myfxbookAccountId} (ETF Gold · {GOLD.currency}). Pulled server-side every page load and refreshed daily by Vercel cron. Open positions show unrealised P/L from the public ledger; realised P/L books on close. No off-book activity — every fill an investor replicates lands here.
+        Every trade on this page is real and pulled live from Myfxbook — the same public statements anyone can open and verify for V10 (#{V10.myfxbookAccountId} · {V10.currency}) and ETF Gold (#{GOLD.myfxbookAccountId} · {GOLD.currency}). Open positions show live floating profit; closed trades show the final result. Nothing is hidden or edited — what you see here is exactly what the live accounts traded.
       </div>
     </div>
   );
