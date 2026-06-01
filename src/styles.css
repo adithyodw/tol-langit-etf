@@ -386,6 +386,51 @@ body { font-family: 'Geist', system-ui, sans-serif; font-feature-settings: 'ss01
 .pillar-h { font-size: 13.5px; color: var(--ink); margin-bottom: 4px; font-weight: 500; }
 .pillar-p { font-size: 12.5px; line-height: 1.5; color: var(--muted); }
 
+/* ── Engine card ─────────────────────────────────────────────────────── */
+.engine-gh-link {
+  font-size: 11px; font-weight: 600; letter-spacing: .04em;
+  color: var(--accent); text-decoration: none;
+}
+.engine-card { padding: 0; overflow: hidden; }
+.engine-header {
+  display: flex; align-items: center; gap: 14px;
+  padding: 16px 16px 14px; border-bottom: 1px solid var(--border);
+}
+.engine-icon { font-size: 22px; line-height: 1; }
+.engine-title { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 2px; }
+.engine-sub   { font-size: 11.5px; color: var(--muted); }
+.engine-body  { padding: 14px 16px 16px; }
+.engine-lead  {
+  font-size: 13px; line-height: 1.55; color: var(--ink);
+  margin: 0 0 14px;
+}
+.engine-lead strong { color: var(--accent); font-weight: 600; }
+.engine-pillars { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
+.engine-pillar  { display: grid; grid-template-columns: 28px 1fr; gap: 8px; align-items: start; }
+.engine-pillar-icon { font-size: 16px; line-height: 1.3; }
+.engine-pillar-h    { font-size: 12.5px; font-weight: 600; color: var(--ink); margin-bottom: 2px; }
+.engine-pillar-p    { font-size: 12px; line-height: 1.5; color: var(--muted); }
+.engine-why {
+  background: var(--surface-2, #f5f3ef); border-radius: 8px;
+  padding: 14px; margin-top: 4px;
+}
+.engine-why-title {
+  font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--ink); margin-bottom: 8px;
+}
+.engine-why-body {
+  font-size: 12.5px; line-height: 1.55; color: var(--muted);
+  margin: 0 0 12px;
+}
+.engine-why-body em { font-style: italic; color: var(--ink); }
+.engine-gh-btn {
+  display: inline-block; padding: 8px 14px;
+  background: var(--ink); color: var(--bg);
+  font-size: 11.5px; font-weight: 600; letter-spacing: .04em;
+  border-radius: 6px; text-decoration: none;
+}
+.engine-gh-btn:active { opacity: .8; }
+
 .risk-row {
   display: flex; align-items: center; justify-content: space-between; gap: 14px;
   padding: 6px 0 14px;

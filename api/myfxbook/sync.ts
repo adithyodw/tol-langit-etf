@@ -18,18 +18,17 @@
 // Endpoints used (all under https://www.myfxbook.com/api):
 //   - login.json            (critical)
 //   - get-my-accounts.json  (critical — all headline figures)
+//   - get-daily-gain.json   (best-effort — used to derive monthly returns)
 //   - get-open-trades.json  (best-effort)
 //   - get-open-orders.json  (best-effort)
 //   - get-history.json      (best-effort)
 //   - logout.json           (cleanup)
 //
-// TODO: Monthly breakdown endpoint
-//   Myfxbook API does NOT currently expose monthly returns directly.
-//   Monthly data is displayed on portfolio pages but not via API.
-//   When (if) Myfxbook adds a monthly endpoint (e.g., get-monthly-gains.json),
-//   fetch it here and populate monthlyByYear in the response.
-//   Until then: client uses verified static data from src/data/monthlyReturns.ts
-//   merged via mergeMonthly() which overlays any live monthly data on top.
+// Monthly returns:
+//   get-daily-gain.json returns cumulative absolute gain % for each day.
+//   We chain-link adjacent month-end values to derive each calendar month's
+//   return: monthly% = ((100 + endGain) / (100 + prevEndGain) - 1) * 100
+//   This exactly replicates what Myfxbook shows in Monthly Analytics.
 import { VercelRequest, VercelResponse } from '@vercel/node';
 
 // Allow the function enough wall-clock time to complete the worst-case
@@ -405,6 +404,75 @@ function buildSummary(
 }
 
 
+interface DailyGainResponse {
+  error?: boolean;
+  message?: string;
+  dailyGain?: Array<[string, number]>;
+}
+
+// Convert Myfxbook cumulative daily gains into calendar-month returns.
+// get-daily-gain.json returns [dateStr, cumulativeAbsGainPct] per trading day.
+// We take the last value each month, then chain-link adjacent months:
+//   monthly% = ((100 + endGain) / (100 + prevMonthEndGain) - 1) × 100
+// This reproduces exactly the figures shown in Myfxbook Monthly Analytics.
+function buildMonthlyFromCumulativeGain(
+  dailyGain: Array<[string, number]>
+): MonthlyByYear {
+  const monthEnd = new Map<string, { year: number; month: number; gain: number }>();
+
+  for (const [dateStr, gain] of dailyGain) {
+    if (typeof gain !== 'number' || !Number.isFinite(gain)) continue;
+    const d = new Date(dateStr);
+    if (Number.isNaN(d.getTime())) continue;
+    const year = d.getUTCFullYear();
+    const month = d.getUTCMonth() + 1;
+    const key = `${year}-${String(month).padStart(2, '0')}`;
+    monthEnd.set(key, { year, month, gain }); // last entry each month wins
+  }
+
+  const entries = Array.from(monthEnd.values()).sort((a, b) =>
+    a.year !== b.year ? a.year - b.year : a.month - b.month
+  );
+
+  const result: MonthlyByYear = {};
+  let prevGain = 0;
+
+  for (const { year, month, gain } of entries) {
+    const monthlyReturn = ((100 + gain) / (100 + prevGain) - 1) * 100;
+    prevGain = gain;
+    if (monthlyReturn <= -100 || monthlyReturn >= 1000) continue; // plausibility guard
+    if (!result[year]) result[year] = {};
+    result[year][month] = Math.round(monthlyReturn * 100) / 100;
+  }
+
+  return result;
+}
+
+// Best-effort: fetch daily gain and return monthly breakdown.
+// Never throws — returns {} on any failure so it can't break the sync.
+async function fetchMonthlyReturns(
+  session: string,
+  accountId: number,
+  startDate: string   // 'YYYY-MM-DD' — account open date
+): Promise<MonthlyByYear> {
+  try {
+    const today = new Date().toISOString().slice(0, 10);
+    const url =
+      `${BASE_URL}/get-daily-gain.json` +
+      `?session=${encodeURIComponent(session)}` +
+      `&id=${accountId}` +
+      `&start=${startDate}` +
+      `&end=${today}`;
+    const data = await safeJson<DailyGainResponse>(url, FEED_TIMEOUT_MS);
+    if (!data || data.error || !Array.isArray(data.dailyGain) || !data.dailyGain.length) {
+      return {};
+    }
+    return buildMonthlyFromCumulativeGain(data.dailyGain);
+  } catch {
+    return {};
+  }
+}
+
 interface AccountFeeds {
   open: NormalisedTrade[];
   orders: NormalisedOrder[];
@@ -484,11 +552,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const v10Account = getAccount(accountsData, v10Id);
     const goldAccount = getAccount(accountsData, goldId);
 
-    // From here the sync succeeds. Trade feeds are best-effort and cannot
-    // fail the response — at worst they degrade to empty arrays.
-    const [v10Feeds, goldFeeds] = await Promise.all([
+    // From here the sync succeeds. Trade feeds and monthly data are
+    // best-effort — any failure degrades gracefully, never fails the sync.
+    const [v10Feeds, goldFeeds, v10Monthly, goldMonthly] = await Promise.all([
       fetchAccountFeeds(session, v10Id),
       fetchAccountFeeds(session, goldId),
+      fetchMonthlyReturns(session, v10Id,   '2021-07-01'),  // V10 live since Jul 2021
+      fetchMonthlyReturns(session, goldId,  '2025-02-09'),  // Gold live since Feb 2025
     ]);
 
     const v10Payload: NormalisedAccountPayload = {
@@ -499,10 +569,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       openTrades: v10Feeds.open,
       openOrders: v10Feeds.orders,
       history: v10Feeds.history,
-      // Monthly data is stable (doesn't change after month ends).
-      // Use verified static data from src/data/monthlyReturns.ts instead
-      // of recalculating from trades (prone to rounding errors).
-      monthlyByYear: {},
+      monthlyByYear: v10Monthly,   // live chain-linked from get-daily-gain.json
     };
 
     const goldPayload: NormalisedAccountPayload = {
@@ -513,7 +580,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       openTrades: goldFeeds.open,
       openOrders: goldFeeds.orders,
       history: goldFeeds.history,
-      monthlyByYear: {},
+      monthlyByYear: goldMonthly,  // live chain-linked from get-daily-gain.json
     };
 
     res.setHeader('Cache-Control', 's-maxage=600, stale-while-revalidate=86400');

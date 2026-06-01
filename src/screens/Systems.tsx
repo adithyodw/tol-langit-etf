@@ -102,6 +102,81 @@ export function Systems({ v10, gold }: Props) {
         </div>
       </div>
 
+      <div className="section-label">
+        <span>Open-Source Engine</span>
+        <span className="section-right">
+          <a
+            href="https://github.com/adithyodw/LQS-AI-INSTITUTIONAL-ENGINE"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="engine-gh-link"
+          >
+            GitHub ↗
+          </a>
+        </span>
+      </div>
+      <div className="card engine-card">
+        <div className="engine-header">
+          <div className="engine-icon">⚙</div>
+          <div>
+            <div className="engine-title">LQS AI Institutional Engine</div>
+            <div className="engine-sub">The algorithmic core powering both TOL LANGIT products</div>
+          </div>
+        </div>
+
+        <div className="engine-body">
+          <p className="engine-lead">
+            The strategy logic is <strong>fully open source</strong>. Every rule, every risk limit, every entry and exit condition is published on GitHub — readable by anyone, auditable by everyone.
+          </p>
+
+          <div className="engine-pillars">
+            <div className="engine-pillar">
+              <div className="engine-pillar-icon">🔓</div>
+              <div>
+                <div className="engine-pillar-h">No Black Box</div>
+                <div className="engine-pillar-p">The code that runs on the broker is the same code on GitHub. You can read exactly what the EA does before investing a single dollar.</div>
+              </div>
+            </div>
+            <div className="engine-pillar">
+              <div className="engine-pillar-icon">🏦</div>
+              <div>
+                <div className="engine-pillar-h">Institutional-Grade Risk</div>
+                <div className="engine-pillar-p">Built with the same risk management concepts used by professional funds — dynamic position sizing, volatility-adjusted lot calculation, and hard drawdown limits built in at the code level.</div>
+              </div>
+            </div>
+            <div className="engine-pillar">
+              <div className="engine-pillar-icon">🤖</div>
+              <div>
+                <div className="engine-pillar-h">AI-Assisted Regime Detection</div>
+                <div className="engine-pillar-p">The engine reads market structure in real time — ranging vs. trending, low vs. high volatility. It adapts its behaviour to fit current conditions rather than using fixed rules that break during market regime shifts.</div>
+              </div>
+            </div>
+            <div className="engine-pillar">
+              <div className="engine-pillar-icon">📐</div>
+              <div>
+                <div className="engine-pillar-h">Equity-Scaled Sizing</div>
+                <div className="engine-pillar-p">Lot sizes are calculated as a fraction of your live equity — they grow automatically as your account grows. No manual adjustments needed when you top up monthly.</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="engine-why">
+            <div className="engine-why-title">Why does open source matter for an investor?</div>
+            <p className="engine-why-body">
+              Most trading products hide their strategy. You're asked to trust a track record without seeing why it works. With LQS AI, you can verify the logic yourself — or have any developer do it for you. The Myfxbook statement proves <em>what</em> happened; the GitHub repo proves <em>how and why</em>.
+            </p>
+            <a
+              href="https://github.com/adithyodw/LQS-AI-INSTITUTIONAL-ENGINE"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="engine-gh-btn"
+            >
+              View Source on GitHub ↗
+            </a>
+          </div>
+        </div>
+      </div>
+
       <div className="footnote">
         Indicative exposure over the trailing 90 trading days, read from the live broker statement. Real-time exposure rebalances on every fill — this view is a snapshot, not a fixed mandate.
       </div>
