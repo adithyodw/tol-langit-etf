@@ -467,26 +467,34 @@ function parseYearMonth(dateStr: string): { year: number; month: number } | null
   return null;
 }
 
-// Compound each day's gain inside its calendar month to get the monthly return.
-// This is exactly how Myfxbook computes "Monthly Gain (Change)":
-//   monthly% = ( ∏(1 + dailyValue/100) - 1 ) × 100
+// get-daily-gain `value` is the CUMULATIVE gain-to-date (the growth curve),
+// not the daily change — e.g. 02/20→0, 02/24→14.57, 02/26→24.87.
+// To get each calendar month's return we take the LAST cumulative value of
+// the month and chain-link it against the previous month's last value:
+//   monthly% = ( (100 + cumEnd) / (100 + cumPrevEnd) - 1 ) × 100
+// This reproduces Myfxbook's Monthly Analytics exactly (Feb end 24.87 → +24.87%).
 function buildMonthlyFromDailyGain(dailyGain: unknown): MonthlyByYear {
   const points = extractDailyPoints(dailyGain);
   if (!points.length) return {};
 
-  const factors = new Map<string, { year: number; month: number; factor: number }>();
+  // Last cumulative value seen per calendar month (points arrive chronologically).
+  const monthEnd = new Map<string, { year: number; month: number; cum: number }>();
   for (const { date, value } of points) {
     const ym = parseYearMonth(date);
     if (!ym) continue;
     const key = `${ym.year}-${String(ym.month).padStart(2, '0')}`;
-    const cur = factors.get(key) ?? { year: ym.year, month: ym.month, factor: 1 };
-    cur.factor *= 1 + value / 100;
-    factors.set(key, cur);
+    monthEnd.set(key, { year: ym.year, month: ym.month, cum: value });
   }
 
+  const entries = Array.from(monthEnd.values()).sort((a, b) =>
+    a.year !== b.year ? a.year - b.year : a.month - b.month
+  );
+
   const result: MonthlyByYear = {};
-  for (const { year, month, factor } of factors.values()) {
-    const monthlyReturn = (factor - 1) * 100;
+  let prevCum = 0; // account starts at 0% cumulative
+  for (const { year, month, cum } of entries) {
+    const monthlyReturn = ((100 + cum) / (100 + prevCum) - 1) * 100;
+    prevCum = cum;
     if (monthlyReturn <= -100 || monthlyReturn >= 1000) continue; // plausibility guard
     if (!result[year]) result[year] = {};
     result[year][month] = Math.round(monthlyReturn * 100) / 100;
