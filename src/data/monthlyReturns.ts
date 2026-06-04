@@ -14,14 +14,16 @@
 
 export type MonthlyByYear = Record<number, Partial<Record<number, number>>>;
 
+// These mirror exactly what the live get-daily-gain chain-link produces, so the
+// cold-start fallback is identical to the live sync (which overlays on load).
 export const V10_MONTHLY: MonthlyByYear = {
   2021: {
     7: 21.56,
-    8: 10.75,
+    8: 11.11,
     9: 21.60,
-    10: 20.90,
-    11: 20.11,
-    12: 15.49,
+    10: 22.49,
+    11: 20.55,
+    12: 16.67,
   },
   2022: {
     1: 14.64,
@@ -41,7 +43,7 @@ export const V10_MONTHLY: MonthlyByYear = {
     1: 4.13,
     2: 3.13,
     3: 3.16,
-    4: 2.85,
+    4: 2.86,
     5: 2.13,
     6: 2.74,
     7: 3.09,
@@ -51,16 +53,16 @@ export const V10_MONTHLY: MonthlyByYear = {
     12: 6.23,
   },
   2024: {
-    1: 4.76,
+    1: 4.75,
     2: 4.13,
     3: 4.35,
-    4: 1.82,
+    4: 1.83,
     5: 0.05,
     6: 8.31,
     7: 0.28,
     8: 8.89,
     9: 0.69,
-    10: 5.99,
+    10: 6.00,
     11: 11.34,
     12: 7.14,
   },
@@ -70,9 +72,9 @@ export const V10_MONTHLY: MonthlyByYear = {
     3: 3.69,
     4: 9.63,
     5: 4.27,
-    6: 5.11,
+    6: 5.10,
     7: 3.12,
-    8: 5.65,
+    8: 5.64,
     9: 2.66,
     10: 0.25,
     11: 2.39,
@@ -86,14 +88,12 @@ export const V10_MONTHLY: MonthlyByYear = {
   },
 };
 
-// Growth-based monthly returns (Myfxbook "Growth" view) — these are exactly
-// what compounding get-daily-gain produces, so the live sync overlays cleanly.
 export const GOLD_MONTHLY: MonthlyByYear = {
   2026: {
-    2: 23.87,
-    3: -16.82,
-    4: 180.33,
-    5: 57.12,
+    2: 24.87,
+    3: -17.88,
+    4: 190.84,
+    5: 57.06,
     6: 8.59,
   },
 };

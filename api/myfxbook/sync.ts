@@ -502,71 +502,28 @@ function buildMonthlyFromDailyGain(dailyGain: unknown): MonthlyByYear {
   return result;
 }
 
-// Best-effort: fetch daily gain and return monthly breakdown + diagnostics.
+// Best-effort: fetch daily gain and return the monthly breakdown.
 // Never throws — returns {} on any failure so it can't break the sync.
-// The `diag` object is surfaced under response._diag to pin down failures.
-interface MonthlyDiag {
-  httpStatus?: number;
-  rawLength?: number;
-  rawSample?: string;
-  parseError?: string;
-  apiError?: boolean;
-  apiMessage?: string;
-  dailyGainType?: string;
-  dailyGainLen?: number | null;
-  firstEntry?: string;
-  monthlyKeys?: string[];
-  fetchError?: string;
-}
-
+// NOTE: pass the RAW session token. encodeURIComponent() corrupts it and
+// Myfxbook then rejects the call with "Invalid session".
 async function fetchMonthlyReturns(
   session: string,
   accountId: number,
   startDate: string   // 'YYYY-MM-DD' — account open date
-): Promise<{ monthly: MonthlyByYear; diag: MonthlyDiag }> {
-  const diag: MonthlyDiag = {};
+): Promise<MonthlyByYear> {
   try {
     const today = new Date().toISOString().slice(0, 10);
-    // Use the RAW session token, exactly like the working feed calls.
-    // encodeURIComponent() corrupts the token -> Myfxbook "Invalid session".
     const url =
       `${BASE_URL}/get-daily-gain.json` +
       `?session=${session}` +
       `&id=${accountId}` +
       `&start=${startDate}` +
       `&end=${today}`;
-
-    const res = await fetchWithTimeout(url, MONTHLY_TIMEOUT_MS);
-    diag.httpStatus = res.status;
-    const text = await res.text();
-    diag.rawLength = text.length;
-    diag.rawSample = text.slice(0, 240);
-
-    let data: DailyGainResponse;
-    try {
-      data = JSON.parse(text) as DailyGainResponse;
-    } catch (e) {
-      diag.parseError = String(e);
-      return { monthly: {}, diag };
-    }
-
-    diag.apiError = data.error;
-    diag.apiMessage = data.message;
-    diag.dailyGainType = Array.isArray(data.dailyGain) ? 'array' : typeof data.dailyGain;
-    diag.dailyGainLen = Array.isArray(data.dailyGain) ? data.dailyGain.length : null;
-    if (Array.isArray(data.dailyGain) && data.dailyGain.length) {
-      diag.firstEntry = JSON.stringify(data.dailyGain[0]).slice(0, 200);
-    }
-
-    if (data.error || !Array.isArray(data.dailyGain)) {
-      return { monthly: {}, diag };
-    }
-    const monthly = buildMonthlyFromDailyGain(data.dailyGain);
-    diag.monthlyKeys = Object.keys(monthly);
-    return { monthly, diag };
-  } catch (e) {
-    diag.fetchError = String(e);
-    return { monthly: {}, diag };
+    const data = await safeJson<DailyGainResponse>(url, MONTHLY_TIMEOUT_MS);
+    if (!data || data.error || !Array.isArray(data.dailyGain)) return {};
+    return buildMonthlyFromDailyGain(data.dailyGain);
+  } catch {
+    return {};
   }
 }
 
@@ -651,7 +608,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // From here the sync succeeds. Trade feeds and monthly data are
     // best-effort — any failure degrades gracefully, never fails the sync.
-    const [v10Feeds, goldFeeds, v10MonthlyRes, goldMonthlyRes] = await Promise.all([
+    const [v10Feeds, goldFeeds, v10Monthly, goldMonthly] = await Promise.all([
       fetchAccountFeeds(session, v10Id),
       fetchAccountFeeds(session, goldId),
       fetchMonthlyReturns(session, v10Id,   '2021-07-01'),  // V10 live since Jul 2021
@@ -666,7 +623,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       openTrades: v10Feeds.open,
       openOrders: v10Feeds.orders,
       history: v10Feeds.history,
-      monthlyByYear: v10MonthlyRes.monthly,   // compounded from get-daily-gain.json
+      monthlyByYear: v10Monthly,   // chain-linked from get-daily-gain.json
     };
 
     const goldPayload: NormalisedAccountPayload = {
@@ -677,7 +634,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       openTrades: goldFeeds.open,
       openOrders: goldFeeds.orders,
       history: goldFeeds.history,
-      monthlyByYear: goldMonthlyRes.monthly,  // compounded from get-daily-gain.json
+      monthlyByYear: goldMonthly,  // chain-linked from get-daily-gain.json
     };
 
     res.setHeader('Cache-Control', 's-maxage=600, stale-while-revalidate=86400');
@@ -685,7 +642,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       success: true,
       lastUpdated: new Date().toISOString(),
       accounts: { v10: v10Payload, gold: goldPayload },
-      _diag: { v10: v10MonthlyRes.diag, gold: goldMonthlyRes.diag },
     });
   } catch (error: unknown) {
     const reason = getErrorMessage(error);
