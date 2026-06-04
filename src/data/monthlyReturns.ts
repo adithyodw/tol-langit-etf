@@ -86,12 +86,15 @@ export const V10_MONTHLY: MonthlyByYear = {
   },
 };
 
+// Growth-based monthly returns (Myfxbook "Growth" view) — these are exactly
+// what compounding get-daily-gain produces, so the live sync overlays cleanly.
 export const GOLD_MONTHLY: MonthlyByYear = {
   2026: {
-    2: 24.87,
-    3: -17.89,
-    4: 190.85,
-    5: 57.06,
+    2: 23.87,
+    3: -16.82,
+    4: 180.33,
+    5: 57.12,
+    6: 8.59,
   },
 };
 

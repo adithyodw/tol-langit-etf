@@ -48,6 +48,8 @@ const HISTORY_LIMIT = 80;
 const LOGIN_TIMEOUT_MS = 10_000;
 const ACCOUNTS_TIMEOUT_MS = 10_000;
 const FEED_TIMEOUT_MS = 8_000;
+// Monthly (daily-gain) can span years of daily points for V10 — give it room.
+const MONTHLY_TIMEOUT_MS = 15_000;
 const LOGOUT_TIMEOUT_MS = 4_000;
 
 interface MyfxbookLoginResponse {
@@ -507,7 +509,7 @@ async function fetchMonthlyReturns(
       `&id=${accountId}` +
       `&start=${startDate}` +
       `&end=${today}`;
-    const data = await safeJson<DailyGainResponse>(url, FEED_TIMEOUT_MS);
+    const data = await safeJson<DailyGainResponse>(url, MONTHLY_TIMEOUT_MS);
     if (!data || data.error || !Array.isArray(data.dailyGain)) {
       return {};
     }
