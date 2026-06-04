@@ -519,9 +519,11 @@ async function fetchMonthlyReturns(
   const diag: MonthlyDiag = {};
   try {
     const today = new Date().toISOString().slice(0, 10);
+    // Use the RAW session token, exactly like the working feed calls.
+    // encodeURIComponent() corrupts the token -> Myfxbook "Invalid session".
     const url =
       `${BASE_URL}/get-daily-gain.json` +
-      `?session=${encodeURIComponent(session)}` +
+      `?session=${session}` +
       `&id=${accountId}` +
       `&start=${startDate}` +
       `&end=${today}`;
